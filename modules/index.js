@@ -3,8 +3,8 @@ export createIO from './createIO'
 
 // Source creation
 // Returns source.
-export routes from '././routes'
-export methods from '././methods'
+export routes from './routes'
+export methods from './methods'
 export alias from './alias'
 export json from './json'
 export memory from './memory'
@@ -14,7 +14,6 @@ export memory from './memory'
 export wrapCache from './wrapCache'
 export wrapMultipleUrls from './wrapMultipleUrls'
 export wrapNesting from './wrapNesting'
-export wrapRecursion from './wrapRecursion'
 export wrapStandardRequest from './wrapStandardRequest'
 
 // Standard combo of wrappers

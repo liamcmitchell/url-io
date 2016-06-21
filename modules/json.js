@@ -3,9 +3,10 @@ import {map} from 'rxjs/operator/map'
 const parse = JSON.parse.bind(JSON)
 
 // JSON transform.
-// Stringifies request.value and parses OBSERVE and GET.
-// Requires recursion (request.source).
+// Stringifies request.value and parses OBSERVE.
 export default function jsonSource(request) {
+  const {io, url, method} = request
+
   request = Object.assign({}, request)
 
   // If sending a value, transform.
@@ -13,13 +14,10 @@ export default function jsonSource(request) {
     request.value = JSON.stringify(request.value, null, 2)
   }
 
-  const result = request.source(request)
+  const result = io(url).request(request)
 
-  if (request.method === 'OBSERVE') {
+  if (method === 'OBSERVE') {
     return result::map(parse)
-  }
-  else if (request.method === 'GET') {
-    return result.next(parse)
   }
   else {
     return result
