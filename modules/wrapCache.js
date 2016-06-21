@@ -23,7 +23,8 @@ function createCacheableObservable(source, cache, request) {
 
     // Start with last value if possible.
     if (cache[url].hasOwnProperty('lastValue')) {
-      return startWith(cache[url].observable, cache[url].lastValue)
+      return cache[url].observable
+        ::startWith(cache[url].lastValue)
         .subscribe(observer)
     }
     else {
