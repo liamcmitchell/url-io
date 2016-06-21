@@ -1,3 +1,4 @@
+import {Observable} from 'rxjs/Observable'
 import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
 
@@ -29,6 +30,7 @@ export default function createIO(source, methods = {}) {
       const o = this.request({method: 'OBSERVE'})
       return o.subscribe.apply(o, arguments)
     },
+    lift: Observable.prototype.lift,
 
     // Allows use as promise.
     next: function() {
