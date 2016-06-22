@@ -28,27 +28,14 @@ function set(path, object, value) {
 
 // Store value using BehaviorSubject.
 // Allow deep get and set via url.
-export default function memorySource(initialValue) {
+export default function memory(initialValue) {
   const subject = new BehaviorSubject(initialValue)
 
   return methods({
-    OBSERVE: function(request) {
-      const path = urlToArray(request.url)
-      if (path.length === 0) {
-        return subject
-      }
-      else {
-        return subject::map(get.bind(null, path))
-      }
-    },
-    SET: function(request) {
-      const path = urlToArray(request.url)
-      if (path.length === 0) {
-        subject.onNext(request.value)
-      }
-      else {
-        subject.onNext(set(path, subject.getValue(), request.value))
-      }
+    OBSERVE: ({url}) =>
+      subject::map(get.bind(null, urlToArray(url))),
+    SET: ({url, value}) => {
+      subject.next(set(urlToArray(url), subject.getValue(), value))
       return Promise.resolve()
     }
   })

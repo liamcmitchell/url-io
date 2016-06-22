@@ -8,6 +8,7 @@ export methods from './methods'
 export alias from './alias'
 export json from './json'
 export memory from './memory'
+export storage from './storage'
 
 // Source wrapping
 // Takes in a source, returns new source with extra functionality.
