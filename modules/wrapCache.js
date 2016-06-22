@@ -2,7 +2,7 @@ import {Observable} from 'rxjs/Observable'
 import {_do} from 'rxjs/operator/do'
 import {_finally} from 'rxjs/operator/finally'
 import {share} from 'rxjs/operator/share'
-import {startWith} from 'rxjs/operator/startwith'
+import {startWith} from 'rxjs/operator/startWith'
 
 // A cacheable observable needs to add itself to the cache on subscription
 // and remove itself on unsubscribe.
