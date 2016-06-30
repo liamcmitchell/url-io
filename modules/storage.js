@@ -5,6 +5,8 @@ import {of} from 'rxjs/observable/of'
 import {Subject} from 'rxjs/Subject'
 import {filter} from 'rxjs/operator/filter'
 import {pluck} from 'rxjs/operator/pluck'
+import {map} from 'rxjs/operator/map'
+import {get, set} from './nested'
 
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
@@ -27,14 +29,10 @@ export default function storage(Storage) {
 
   return methods({
     OBSERVE: function({url}) {
-      const [key, next] = urlToArray(url)
+      const [key, ...path] = urlToArray(url)
 
       if (!key) {
         throw new Error('Key required for Storage')
-      }
-
-      if (next) {
-        throw new Error('Deep linking not supported')
       }
 
       return merge(
@@ -43,17 +41,18 @@ export default function storage(Storage) {
           ::filter(u => u.key === key)
           ::pluck('value')
       )
+        // Allow getting nested values.
+        ::map(v => get(v, path))
     },
     SET: function({url, value}) {
-      const [key, next] = urlToArray(url)
+      const [key, ...path] = urlToArray(url)
 
       if (!key) {
         throw new Error('Key required for Storage')
       }
 
-      if (next) {
-        throw new Error('Deep linking not supported')
-      }
+      // Allow setting nested values.
+      value = set(JSON.parse(Storage.getItem(key)), path, value)
 
       Storage.setItem(key, JSON.stringify(value))
       updates$.next({key, value})

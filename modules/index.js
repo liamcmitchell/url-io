@@ -9,6 +9,7 @@ export alias from './alias'
 export json from './json'
 export memory from './memory'
 export storage from './storage'
+export location from './location'
 
 // Source wrapping
 // Takes in a source, returns new source with extra functionality.
