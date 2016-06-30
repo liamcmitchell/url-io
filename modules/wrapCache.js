@@ -1,8 +1,10 @@
 import {Observable} from 'rxjs/Observable'
+import {never} from 'rxjs/observable/never'
 import {_do} from 'rxjs/operator/do'
 import {_finally} from 'rxjs/operator/finally'
 import {share} from 'rxjs/operator/share'
 import {startWith} from 'rxjs/operator/startWith'
+import {merge} from 'rxjs/operator/merge'
 
 // A cacheable observable needs to add itself to the cache on subscription
 // and remove itself on unsubscribe.
@@ -15,8 +17,14 @@ function createCacheableObservable(source, cache, request) {
       // Get observable from wrapped source.
       cache[url] = {
         observable: source(request)
+          // Update lastValue.
           ::_do(v => {cache[url].lastValue = v})
-          ::_finally(() => {delete cache[url]})
+          // Ignore complete by merging never.
+          // We only want to remove from cache on unsubscribe.
+          ::merge(never())
+          // Remove from cache.
+          ::_finally(() => { delete cache[url] })
+          // Share single copy of original observable.
           ::share()
       }
     }
