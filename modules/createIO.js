@@ -37,7 +37,7 @@ export default function createIO(source, methods = {}) {
     lift: Observable.prototype.lift,
 
     // Allows use as promise.
-    next: function() {
+    then: function() {
       // We send an observer instead of a promise because we don't want to
       // support two different read methods and we will always prefer
       // observe. The single bool is there for read once optimizations.
@@ -46,7 +46,7 @@ export default function createIO(source, methods = {}) {
         // Allow sources to avoid watching.
         single: true
       })::take(1)::toPromise()
-      return p.next.apply(p, arguments)
+      return p.then.apply(p, arguments)
     }
   })
 

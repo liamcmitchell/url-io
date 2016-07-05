@@ -21,5 +21,7 @@ export wrapStandardRequest from './wrapStandardRequest'
 // Standard combo of wrappers
 export wrapStandard from './wrapStandard'
 
+export withIO from './withIO'
+
 // Helpers
 export url from './url'
