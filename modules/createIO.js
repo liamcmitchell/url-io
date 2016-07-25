@@ -2,59 +2,88 @@ import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
 import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
+import {_throw} from 'rxjs/observable/throw'
+import isObservable from './isObservable'
+import {ioRequest} from './url'
 
-// Return URL first API.
-export default function createIO(source, methods = {}) {
+// Return consumer friendly API.
+export default function createIO(source) {
   if (typeof source !== 'function') {
     throw new Error('Source must be a function')
   }
 
-  // The temp object to chain methods off.
-  function ioURL(url) {
-    this.url = url
+  const safeSource = request => {
+    try {
+      const result = source(request)
+      if (!isObservable(result)) {
+        return _throw(new Error(`Source for ${request.path} didn't return observable`))
+      }
+      return result
+    }
+    catch (error) {
+      return _throw(error)
+    }
   }
 
-  // Add methods to prototype.
-  ioURL.prototype = Object.assign(methods, {
-    // Make request to source.
-    // Method OBSERVE returns observable, all others return promise.
-    request: function(request) {
-      return source(Object.assign({}, request, {
-        url: this.url,
-        // Pass this interface so sources can recurse.
-        io
-      }))
-    },
+  // Temp object representing observable url.
+  // Can be consumed as observable or promise.
+  function LazyIO(request) {
+    this.request = request
+  }
 
-    // Allows use as observable.
-    subscribe: function() {
-      const o = this.request({method: 'OBSERVE'})
-      return o.subscribe.apply(o, arguments)
-    },
-    // Allow interop using symbol-observable.
-    [$$observable]: function() { return this },
-    // Allow use with Rx5 operators.
-    lift: Observable.prototype.lift,
+  // Allow use as observable.
+  LazyIO.prototype.subscribe = function() {
+    const o = safeSource(this.request)
+    return o.subscribe.apply(o, arguments)
+  }
 
-    // Allows use as promise.
-    then: function() {
-      // We send an observer instead of a promise because we don't want to
-      // support two different read methods and we will always prefer
-      // observe. The single bool is there for read once optimizations.
-      const p = this.request({
-        method: 'OBSERVE',
-        // Allow sources to avoid watching.
-        single: true
-      })::take(1)::toPromise()
-      return p.then.apply(p, arguments)
+  // Allow interop using symbol-observable.
+  LazyIO.prototype[$$observable] = function() { return this }
+
+  // Allow use with Rx5 operators.
+  LazyIO.prototype.lift = Observable.prototype.lift
+
+  // Allow use as promise.
+  LazyIO.prototype.then = function() {
+    const p = safeSource({
+      ...this.request,
+      // Allow sources to avoid watching.
+      single: true
+    })::take(1)::toPromise()
+    return p.then.apply(p, arguments)
+  }
+
+  // Accept request object like sources or [path, method, params] which
+  // should be easier for consumers to work with.
+  function io(requestOrPath, methodOrParams, params) {
+    const request = ioRequest(requestOrPath, methodOrParams, params)
+
+    const finalRequest = {
+      ...request,
+      io,
+      originalPath: request.path
     }
-  })
 
-  function io(url) {
-    if (!url) {
-      throw new Error('Url required e.g. io(url)')
+    // Observe requests return a lazy object that can be reused.
+    if (request.method === 'OBSERVE') {
+      return new LazyIO(finalRequest)
     }
-    return new ioURL(url)
+    // All other requests send the request immediately and return an
+    // object representing the result.
+    else {
+      const result = safeSource(finalRequest)
+        // Should only emit one value.
+        ::take(1)
+
+      // Allow consuming as promise.
+      if (typeof result.then !== 'function') {
+        const promise = result::toPromise()
+        result.then = ::promise.then
+        result.catch = ::promise.catch
+      }
+
+      return result
+    }
   }
 
   return io

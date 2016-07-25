@@ -1,9 +1,9 @@
 import isArray from 'lodash/isArray'
 import clone from 'lodash/clone'
-import {urlToArray} from './url'
+import {pathToArray} from './url'
 
 export function get(object, path) {
-  path = urlToArray(path)
+  path = pathToArray(path)
 
   return path.reduce((o, key) =>
     o[isArray(o) ? parseInt(key, 10) : key]
@@ -11,7 +11,7 @@ export function get(object, path) {
 }
 
 export function set(object, path, value) {
-  path = urlToArray(path)
+  path = pathToArray(path)
 
   if (path.length === 0) {
     return value

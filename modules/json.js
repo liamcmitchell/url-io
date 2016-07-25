@@ -1,20 +1,22 @@
 import {map} from 'rxjs/operator/map'
 
-const parse = JSON.parse.bind(JSON)
+const parse = ::JSON.parse
 
 // JSON transform.
 // Stringifies request.value and parses OBSERVE.
 export default function jsonSource(request) {
-  const {io, url, method} = request
+  const {io, method, params} = request
 
-  request = Object.assign({}, request)
-
-  // If sending a value, transform.
-  if (request.hasOwnProperty('value')) {
-    request.value = JSON.stringify(request.value, null, 2)
-  }
-
-  const result = io(url).request(request)
+  const result = io({
+    ...request,
+    params: {
+      ...params,
+      // If sending a value, transform.
+      value : params.hasOwnProperty('value') ?
+        JSON.stringify(params.value, null, 2) :
+        params.value
+    }
+  })
 
   if (method === 'OBSERVE') {
     return result::map(parse)

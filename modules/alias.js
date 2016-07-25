@@ -1,6 +1,5 @@
 export default function alias(upstreamUrl) {
-  return function(request) {
-    const {io, url} = request
-    return io(upstreamUrl + url).request(request)
+  return function({io, path, method, params}) {
+    return io(upstreamUrl + path, method, params)
   }
 }

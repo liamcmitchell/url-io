@@ -1,5 +1,5 @@
 import methods from './methods'
-import {urlToArray} from './url'
+import {pathToArray} from './url'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
 import {Subject} from 'rxjs/Subject'
@@ -7,6 +7,7 @@ import {filter} from 'rxjs/operator/filter'
 import {pluck} from 'rxjs/operator/pluck'
 import {map} from 'rxjs/operator/map'
 import {get, set} from './nested'
+import {empty} from 'rxjs/observable/empty'
 
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
@@ -28,8 +29,8 @@ export default function storage(Storage) {
   })
 
   return methods({
-    OBSERVE: function({url}) {
-      const [key, ...path] = urlToArray(url)
+    OBSERVE: function({path}) {
+      const [key, ...objectPath] = pathToArray(path)
 
       if (!key) {
         throw new Error('Key required for Storage')
@@ -42,21 +43,21 @@ export default function storage(Storage) {
           ::pluck('value')
       )
         // Allow getting nested values.
-        ::map(v => get(v, path))
+        ::map(v => get(v, objectPath))
     },
-    SET: function({url, value}) {
-      const [key, ...path] = urlToArray(url)
+    SET: function({path, params: {value}}) {
+      const [key, ...objectPath] = pathToArray(path)
 
       if (!key) {
         throw new Error('Key required for Storage')
       }
 
       // Allow setting nested values.
-      value = set(JSON.parse(Storage.getItem(key)), path, value)
+      value = set(JSON.parse(Storage.getItem(key)), objectPath, value)
 
-      Storage.setItem(key, JSON.stringify(value))
+      Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
       updates$.next({key, value})
-      return Promise.resolve()
+      return empty()
     }
   })
 }

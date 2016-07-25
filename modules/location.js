@@ -4,6 +4,7 @@ import {map} from 'rxjs/operator/map'
 import {publishReplay} from 'rxjs/operator/publishReplay'
 import pick from 'lodash/pick'
 import {get} from './nested'
+import {empty} from 'rxjs/observable/empty'
 
 const locationProperties = [
   'pathname',
@@ -26,11 +27,11 @@ export default function location(history) {
 
   return methods({
     // Allow nested gets.
-    OBSERVE: ({url}) =>
-      location$::map(l => get(l, url)),
-    PUSH: request => {
-      history.push(pick(request, locationProperties))
-      return Promise.resolve()
+    OBSERVE: ({path}) =>
+      location$::map(l => get(l, path)),
+    PUSH: ({params}) => {
+      history.push(pick(params, locationProperties))
+      return empty()
     }
   })
 }

@@ -9,34 +9,35 @@ import {merge} from 'rxjs/operator/merge'
 // A cacheable observable needs to add itself to the cache on subscription
 // and remove itself on unsubscribe.
 function createCacheableObservable(source, cache, request) {
-  const {url} = request
+  const {path, params} = request
+  const key = path + JSON.stringify(params)
 
   return Observable.create(observer => {
     // If there is nothing in the cache, add it.
-    if (!cache[url]) {
+    if (!cache[key]) {
       // Get observable from wrapped source.
-      cache[url] = {
+      cache[key] = {
         observable: source(request)
           // Update lastValue.
-          ::_do(v => {cache[url].lastValue = v})
+          ::_do(v => { cache[key].lastValue = v })
           // Ignore complete by merging never.
           // We only want to remove from cache on unsubscribe.
           ::merge(never())
           // Remove from cache.
-          ::_finally(() => { delete cache[url] })
+          ::_finally(() => { delete cache[key] })
           // Share single copy of original observable.
           ::share()
       }
     }
 
     // Start with last value if possible.
-    if (cache[url].hasOwnProperty('lastValue')) {
-      return cache[url].observable
-        ::startWith(cache[url].lastValue)
+    if (cache[key].hasOwnProperty('lastValue')) {
+      return cache[key].observable
+        ::startWith(cache[key].lastValue)
         .subscribe(observer)
     }
     else {
-      return cache[url].observable
+      return cache[key].observable
         .subscribe(observer)
     }
   })
@@ -46,7 +47,9 @@ export default function wrapCache(source) {
   const c = {}
 
   return function cache(request) {
-    if (request.method === 'OBSERVE') {
+    const {method} = request
+
+    if (method === 'OBSERVE') {
       // The request isn't completed until subscription.
       return createCacheableObservable(source, c, request)
     }
