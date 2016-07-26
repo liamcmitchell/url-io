@@ -16,7 +16,3 @@ export location from './location'
 export wrapCache from './wrapCache'
 
 export withIO from './withIO'
-
-// Helpers
-export url from './url'
-export combineLatestMap from './combineLatestMap'

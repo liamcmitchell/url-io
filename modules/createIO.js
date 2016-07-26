@@ -4,6 +4,7 @@ import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
 import {_throw} from 'rxjs/observable/throw'
 import isObservable from './isObservable'
+import isPromise from './isPromise'
 import {ioRequest} from './url'
 
 // Return consumer friendly API.
@@ -13,15 +14,21 @@ export default function createIO(source) {
   }
 
   const safeSource = request => {
+    const {method, path} = request
     try {
       const result = source(request)
-      if (!isObservable(result)) {
-        return _throw(new Error(`Source for ${request.path} didn't return observable`))
+      if (method === 'OBSERVE' && !isObservable(result)) {
+        return _throw(new Error(`Source for ${path} didn't return Observable`))
+      }
+      if (method !== 'OBSERVE' && !isPromise(result)) {
+        return Promise.reject(new Error(`Source for ${path} didn't return Promise`))
       }
       return result
     }
     catch (error) {
-      return _throw(error)
+      return method === 'OBSERVE' ?
+        _throw(error) :
+        Promise.reject(error)
     }
   }
 
@@ -68,21 +75,9 @@ export default function createIO(source) {
     if (request.method === 'OBSERVE') {
       return new LazyIO(finalRequest)
     }
-    // All other requests send the request immediately and return an
-    // object representing the result.
+    // All other requests send the request immediately and return a promise.
     else {
-      const result = safeSource(finalRequest)
-        // Should only emit one value.
-        ::take(1)
-
-      // Allow consuming as promise.
-      if (typeof result.then !== 'function') {
-        const promise = result::toPromise()
-        result.then = ::promise.then
-        result.catch = ::promise.catch
-      }
-
-      return result
+      return safeSource(finalRequest)
     }
   }
 

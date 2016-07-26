@@ -7,7 +7,6 @@ import {filter} from 'rxjs/operator/filter'
 import {pluck} from 'rxjs/operator/pluck'
 import {map} from 'rxjs/operator/map'
 import {get, set} from './nested'
-import {empty} from 'rxjs/observable/empty'
 
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
@@ -33,7 +32,7 @@ export default function storage(Storage) {
       const [key, ...objectPath] = pathToArray(path)
 
       if (!key) {
-        throw new Error('Key required for Storage')
+        Promise.reject(new Error('Key required for Storage'))
       }
 
       return merge(
@@ -49,7 +48,7 @@ export default function storage(Storage) {
       const [key, ...objectPath] = pathToArray(path)
 
       if (!key) {
-        throw new Error('Key required for Storage')
+        return Promise.reject(new Error('Key required for Storage'))
       }
 
       // Allow setting nested values.
@@ -57,7 +56,7 @@ export default function storage(Storage) {
 
       Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
       updates$.next({key, value})
-      return empty()
+      return Promise.resolve()
     }
   })
 }

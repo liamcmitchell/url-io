@@ -4,7 +4,6 @@ import {map} from 'rxjs/operator/map'
 import {publishReplay} from 'rxjs/operator/publishReplay'
 import pick from 'lodash/pick'
 import {get} from './nested'
-import {empty} from 'rxjs/observable/empty'
 
 const locationProperties = [
   'pathname',
@@ -31,7 +30,7 @@ export default function location(history) {
       location$::map(l => get(l, path)),
     PUSH: ({params}) => {
       history.push(pick(params, locationProperties))
-      return empty()
+      return Promise.resolve()
     }
   })
 }
