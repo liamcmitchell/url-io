@@ -2,6 +2,7 @@ import methods from './methods'
 import {pathToArray} from './url'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
+import {_throw} from 'rxjs/observable/throw'
 import {Subject} from 'rxjs/Subject'
 import {filter} from 'rxjs/operator/filter'
 import {pluck} from 'rxjs/operator/pluck'
@@ -32,7 +33,7 @@ export default function storage(Storage) {
       const [key, ...objectPath] = pathToArray(path)
 
       if (!key) {
-        Promise.reject(new Error('Key required for Storage'))
+        return _throw(new Error('Key required for Storage'))
       }
 
       return merge(

@@ -1,18 +1,16 @@
-// Consumer API
-export createIO from './createIO'
-
-// Source creation
-// Returns source.
-export paths from './paths'
-export methods from './methods'
 export alias from './alias'
+export cache from './cache'
+export createIO from './createIO'
+export currentNextPath from './currentNextPath'
 export json from './json'
-export memory from './memory'
-export storage from './storage'
 export location from './location'
-
-// Source wrapping
-// Takes in a source, returns new source with extra functionality.
-export wrapCache from './wrapCache'
-
+export paths from './paths'
+export memory from './memory'
+export methods from './methods'
+export observeByPolling from './observeByPolling'
+export reject from './reject'
+export storage from './storage'
+export tryCatch from './tryCatch'
 export withIO from './withIO'
+export withPathToken from './withPathToken'
+export wrap from './wrap'

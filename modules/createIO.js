@@ -2,10 +2,10 @@ import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
 import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
-import {_throw} from 'rxjs/observable/throw'
-import isObservable from './isObservable'
-import isPromise from './isPromise'
 import {ioRequest} from './url'
+import wrap from './wrap'
+import tryCatch from './tryCatch'
+import cache from './cache'
 
 // Return consumer friendly API.
 export default function createIO(source) {
@@ -13,24 +13,7 @@ export default function createIO(source) {
     throw new Error('Source must be a function')
   }
 
-  const safeSource = request => {
-    const {method, path} = request
-    try {
-      const result = source(request)
-      if (method === 'OBSERVE' && !isObservable(result)) {
-        return _throw(new Error(`Source for ${path} didn't return Observable`))
-      }
-      if (method !== 'OBSERVE' && !isPromise(result)) {
-        return Promise.reject(new Error(`Source for ${path} didn't return Promise`))
-      }
-      return result
-    }
-    catch (error) {
-      return method === 'OBSERVE' ?
-        _throw(error) :
-        Promise.reject(error)
-    }
-  }
+  source = wrap(source, tryCatch, cache())
 
   // Temp object representing observable url.
   // Can be consumed as observable or promise.
@@ -40,7 +23,7 @@ export default function createIO(source) {
 
   // Allow use as observable.
   LazyIO.prototype.subscribe = function() {
-    const o = safeSource(this.request)
+    const o = source(this.request)
     return o.subscribe.apply(o, arguments)
   }
 
@@ -52,7 +35,7 @@ export default function createIO(source) {
 
   // Allow use as promise.
   LazyIO.prototype.then = function() {
-    const p = safeSource({
+    const p = source({
       ...this.request,
       // Allow sources to avoid watching.
       single: true
@@ -77,7 +60,7 @@ export default function createIO(source) {
     }
     // All other requests send the request immediately and return a promise.
     else {
-      return safeSource(finalRequest)
+      return source(finalRequest)
     }
   }
 

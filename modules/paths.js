@@ -1,65 +1,64 @@
-import {_throw} from 'rxjs/observable/throw'
+import reject from './reject'
+import wrap from './wrap'
+import withPathToken from './withPathToken'
+import currentNextPath from './currentNextPath'
+import omitBy from 'lodash/omitBy'
 
-// Return source that delegates requests based on url.
-// Supports one wildcard path (e.g. '/:id'), all others are
+function routeRequest(paths, request, source) {
+  const [current, next] = currentNextPath(request.path)
+
+  if (paths.hasOwnProperty(current)) {
+    return paths[current]({
+      ...request,
+      path: next
+    })
+  }
+  else if (source) {
+    return source(request)
+  }
+  else {
+    return reject(request, new Error(`No source found for path ${current} at ${request.originalPath}`))
+  }
+}
+
+function isTokenPath(path) {
+  return path[1] === ':'
+}
+
+// Return wrappable source that delegates requests based on url.
+// Supports one token path (e.g. '/:id'), all others are
 // matched exactly.
-// Wildcard is added to the request using the given key.
-// TODO: Move wildcard out.
+// Token is added to the request using the given key.
 export default function paths(paths) {
-  paths = Object.assign({}, paths)
-
   // Check paths.
-  Object.keys(paths).forEach(path => {
+  for (const path in paths) {
     if (path.indexOf('/') !== 0 || path.indexOf('/', 1) !== -1) {
-      throw new Error('Route must start with and contain only one /')
+      throw new Error(`Path key must start with and contain only one / (${path})`)
     }
     if (typeof paths[path] !== 'function') {
-      throw new Error('Route source must be a function')
+      throw new Error(`Path source must be a function (${path})`)
     }
-  })
-
-  // Build wildcard.
-  const wildcardRoutes = Object.keys(paths).filter(k => k[1] === ':')
-  if (wildcardRoutes.length > 1) {
-    throw new Error('Routes can only have one wildcard (/:key)')
-  }
-  const wildcardRoute = wildcardRoutes[0]
-  const wildcardKey = wildcardRoute && wildcardRoute.slice(2)
-  // Prevent overriding known keys.
-  if (['io', 'path', 'originalPath', 'method', 'params'].includes(wildcardKey)) {
-    throw new Error(`Wildcard clashes with reserved key ${wildcardKey} (${wildcardRoute})`)
-  }
-  const wildcardHandler = wildcardRoute && paths[wildcardRoute]
-  // Remove from paths so it can't be hit like a static path.
-  if (wildcardHandler) {
-    delete paths[wildcardRoute]
   }
 
-  return function(request) {
-    // Always start with a slash.
-    const path = request.path || '/'
-    const nextIndex = path.indexOf('/', 1)
-    const currentPath = nextIndex === -1 ?
-      path :
-      path.slice(0, nextIndex)
+  const tokenPath = Object.keys(paths).find(isTokenPath)
 
-    // First try static paths.
-    if (paths.hasOwnProperty(currentPath)) {
-      return paths[currentPath]({
-        ...request,
-        path: nextIndex === -1 ? '' : path.slice(nextIndex)
-      })
-    }
-    // Then try wildcard.
-    else if (wildcardHandler) {
-      return wildcardHandler({
-        ...request,
-        path: nextIndex === -1 ? '' : path.slice(nextIndex),
-        [wildcardKey]: currentPath.slice(1)
-      })
-    }
-    else {
-      _throw(new Error(`No source found for path ${currentPath} at ${request.originalPath}`))
-    }
+  const staticPathSource = routeRequest.bind(null,
+    omitBy(paths, (v, k) => isTokenPath(k))
+  )
+
+  // Return static source if there are is no token to handle.
+  if (!tokenPath) {
+    return staticPathSource
   }
+
+  if (Object.keys(paths).filter(isTokenPath).length > 1) {
+    throw new Error('Paths can only have one token (/:key)')
+  }
+
+  return wrap(
+    paths[tokenPath],
+    withPathToken(tokenPath),
+    // Static paths wrapped last because they are checked first.
+    staticPathSource
+  )
 }

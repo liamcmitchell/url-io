@@ -4,24 +4,21 @@ import keys from 'lodash/keys'
 import values from 'lodash/values'
 import mapValues from 'lodash/mapValues'
 import zipObject from 'lodash/zipObject'
-import {_throw} from 'rxjs/observable/throw'
 import {combineLatest} from 'rxjs/observable/combineLatest'
+import reject from './reject'
 
-export default function withIO(urls, source) {
+export default function withIO(urls) {
   if (!isPlainObject(urls)) {
     throw new Error('withIO requires a map of io urls')
   }
 
-  return function mergeIOintoRequest(request) {
+  return function mergeIOintoRequest(request, source) {
     const {io, method, single = false} = request
 
     // Throw error if url property name clashes with request property.
     if (keys(urls).some(k => request.hasOwnProperty(k))) {
       const key = keys(urls).find(k => request.hasOwnProperty(k))
-      const error = new Error(`withIO property name ${key} clashes with request property`)
-      return method === 'OBSERVE' ?
-        _throw(error) :
-        Promise.reject(error)
+      return reject(request, new Error(`withIO property name ${key} clashes with request property`))
     }
 
     const ioRequests = mapValues(urls, url => {
