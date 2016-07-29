@@ -13,7 +13,7 @@ export default function createIO(source) {
     throw new Error('Source must be a function')
   }
 
-  source = wrap(source, tryCatch, cache())
+  source = wrap(cache(), tryCatch, source)
 
   // Temp object representing observable url.
   // Can be consumed as observable or promise.

@@ -1,24 +1,20 @@
-import reject from './reject'
+import rejectNotFound from './rejectNotFound'
 import wrap from './wrap'
 import withPathToken from './withPathToken'
 import currentNextPath from './currentNextPath'
 import omitBy from 'lodash/omitBy'
 
-function routeRequest(paths, request, source) {
-  const [current, next] = currentNextPath(request.path)
+function routeRequest(paths, request, next = rejectNotFound) {
+  const [currentPath, nextPath] = currentNextPath(request.path)
 
-  if (paths.hasOwnProperty(current)) {
-    return paths[current]({
+  if (paths.hasOwnProperty(currentPath)) {
+    return paths[currentPath]({
       ...request,
-      path: next
+      path: nextPath
     })
   }
-  else if (source) {
-    return source(request)
-  }
-  else {
-    return reject(request, new Error(`No source found for path ${current} at ${request.originalPath}`))
-  }
+
+  return next(request)
 }
 
 function isTokenPath(path) {
@@ -56,9 +52,8 @@ export default function paths(paths) {
   }
 
   return wrap(
-    paths[tokenPath],
+    staticPathSource,
     withPathToken(tokenPath),
-    // Static paths wrapped last because they are checked first.
-    staticPathSource
+    paths[tokenPath]
   )
 }

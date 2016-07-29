@@ -18,7 +18,7 @@ export default function withIO(urls) {
     // Throw error if url property name clashes with request property.
     if (keys(urls).some(k => request.hasOwnProperty(k))) {
       const key = keys(urls).find(k => request.hasOwnProperty(k))
-      return reject(request, new Error(`withIO property name ${key} clashes with request property`))
+      return reject(request, `withIO property name ${key} clashes with request property`)
     }
 
     const ioRequests = mapValues(urls, url => {

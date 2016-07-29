@@ -14,7 +14,7 @@ export default function withPathToken(path) {
     const [current, next] = currentNextPath(request.path)
 
     if (request.hasOwnProperty(key)) {
-      return reject(request, new Error(`withPathToken key ${key} clashes with existing request`))
+      return reject(request, `withPathToken key ${key} clashes with existing request`)
     }
 
     return source({
