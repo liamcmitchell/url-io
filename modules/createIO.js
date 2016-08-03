@@ -2,7 +2,6 @@ import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
 import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
-import {ioRequest} from './url'
 import wrap from './wrap'
 import tryCatch from './tryCatch'
 import cache from './cache'
@@ -46,7 +45,35 @@ export default function createIO(source) {
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
   function io(requestOrPath, methodOrParams, params) {
-    const request = ioRequest(requestOrPath, methodOrParams, params)
+    const request = typeof requestOrPath === 'object' ?
+      {...requestOrPath} :
+      {path: requestOrPath}
+
+    if (!request.hasOwnProperty('method')) {
+      request.method = typeof methodOrParams === 'string' ?
+        methodOrParams :
+        'OBSERVE'
+    }
+
+    if (!request.hasOwnProperty('params')) {
+      request.params = typeof methodOrParams === 'object' ?
+        methodOrParams :
+        typeof params === 'object' ?
+            params :
+            {}
+    }
+
+    if (typeof request.path !== 'string') {
+      throw new Error("io requires a string path e.g. io(\'/path\')")
+    }
+
+    if (typeof request.method !== 'string') {
+      throw new Error("io requires a string method e.g. io('/path', 'OBSERVE')")
+    }
+
+    if (typeof request.params !== 'object') {
+      throw new Error("io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})")
+    }
 
     const finalRequest = {
       ...request,
