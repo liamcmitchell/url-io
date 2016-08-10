@@ -2,6 +2,7 @@ import {never} from 'rxjs/observable/never'
 import {_finally} from 'rxjs/operator/finally'
 import {merge} from 'rxjs/operator/merge'
 import {publishReplay} from 'rxjs/operator/publishReplay'
+import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged'
 
 export default function cache(cache = {}) {
   return function cacheRequest(request, source) {
@@ -17,6 +18,8 @@ export default function cache(cache = {}) {
     if (!cache[key]) {
       // Get observable from wrapped source.
       cache[key] = source(request)
+        // Only emit changes.
+        ::distinctUntilChanged()
         // Ignore complete by merging never.
         // We only want to remove from cache on unsubscribe.
         ::merge(never())
