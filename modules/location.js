@@ -15,7 +15,7 @@ const locationProperties = [
 
 export default function location(history) {
   if (!history || !history.listen || !history.push || !history.getCurrentLocation) {
-    throw new Error('History 3 required e.g. https://github.com/ReactJSTraining/history')
+    throw new Error('History 3 required e.g. https://github.com/mjackson/history')
   }
 
   const location$ = Observable.create(observer => {
@@ -34,6 +34,10 @@ export default function location(history) {
     },
     REPLACE: ({params}) => {
       history.replace(pick(params, locationProperties))
+      return Promise.resolve()
+    },
+    GO_BACK: () => {
+      history.goBack()
       return Promise.resolve()
     }
   })
