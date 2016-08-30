@@ -31,6 +31,10 @@ export default function location(history) {
     PUSH: ({params}) => {
       history.push(pick(params, locationProperties))
       return Promise.resolve()
+    },
+    REPLACE: ({params}) => {
+      history.replace(pick(params, locationProperties))
+      return Promise.resolve()
     }
   })
 }
