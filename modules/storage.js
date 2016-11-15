@@ -24,7 +24,7 @@ export default function storage(Storage) {
     if (storageArea === Storage) {
       updates$.next({
         key,
-        value: newValue
+        value: JSON.parse(newValue)
       })
     }
   })
