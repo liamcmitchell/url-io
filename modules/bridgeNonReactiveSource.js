@@ -43,6 +43,10 @@ export default function bridgeNonReactiveSource(options = {}) {
   const expiredKeys$ = new Subject()
 
   const add = (key, value, expiry) => {
+    // May already have been added, remove older value.
+    if (cache[key]) {
+      clearTimeout(cache[key].expireTimeoutId)
+    }
     cache[key] = {
       value,
       // Set timeout to remove itself on expiry.
