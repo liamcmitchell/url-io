@@ -10,6 +10,16 @@ import {map} from 'rxjs/operator/map'
 import nestedGet from './nestedGet'
 import nestedSet from './nestedSet'
 
+// Safe parse. Returning null should be safe, same result when key does not exist.
+function parse(string) {
+  try {
+    return JSON.parse(string)
+  }
+  catch (e) {
+    return null
+  }
+}
+
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
 export default function storage(Storage) {
@@ -24,7 +34,7 @@ export default function storage(Storage) {
     if (storageArea === Storage) {
       updates$.next({
         key,
-        value: JSON.parse(newValue)
+        value: parse(newValue)
       })
     }
   })
@@ -38,7 +48,7 @@ export default function storage(Storage) {
       }
 
       return merge(
-        of(JSON.parse(Storage.getItem(key))),
+        of(parse(Storage.getItem(key))),
         updates$
           ::filter(u => u.key === key)
           ::pluck('value')
@@ -54,7 +64,7 @@ export default function storage(Storage) {
       }
 
       // Allow setting nested values.
-      value = nestedSet(JSON.parse(Storage.getItem(key)), objectPath, value)
+      value = nestedSet(parse(Storage.getItem(key)), objectPath, value)
 
       Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
       updates$.next({key, value})
