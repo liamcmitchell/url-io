@@ -7,10 +7,10 @@ export default function tryCatch(request, source) {
   try {
     const result = source(request)
     if (method === 'OBSERVE' && !isObservable(result)) {
-      return reject(`Source for ${path} didn't return Observable`)
+      return reject(request, `Source for ${path} didn't return Observable`)
     }
     if (method !== 'OBSERVE' && !isPromise(result)) {
-      return reject(`Source for ${path} didn't return Promise`)
+      return reject(request, `Source for ${path} didn't return Promise`)
     }
     return result
   }
