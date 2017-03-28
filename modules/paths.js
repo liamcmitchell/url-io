@@ -42,7 +42,7 @@ export default function paths(paths) {
     omitBy(paths, (v, k) => isTokenPath(k))
   )
 
-  // Return static source if there are is no token to handle.
+  // Return static source if there is no token to handle.
   if (!tokenPath) {
     return staticPathSource
   }
