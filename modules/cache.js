@@ -5,7 +5,7 @@ import {publishReplay} from 'rxjs/operator/publishReplay'
 import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged'
 
 export default function cache(cache = {}) {
-  return function cacheRequest(request, source) {
+  return source => request => {
     const {path, method, params} = request
 
     if (method !== 'OBSERVE') {

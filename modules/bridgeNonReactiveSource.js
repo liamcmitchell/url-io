@@ -67,66 +67,69 @@ export default function bridgeNonReactiveSource(options = {}) {
       .forEach(key => remove(key))
   }
 
-  const doRequest = (request, source) => {
-    const cacheTime = requestCacheTime(request)
-    const cacheKey = requestCacheKey(request)
-    const cacheInvalidationIterator = requestCacheInvalidationIterator(request)
-    const canCache = cacheTime && !cacheInvalidationIterator
+  return source => {
 
-    if (cacheTime && cacheInvalidationIterator) {
-      console.warn('Requests that mutate/invalidate cache cannot be cached', request)
-    }
+    const doRequest = request => {
+      const cacheTime = requestCacheTime(request)
+      const cacheKey = requestCacheKey(request)
+      const cacheInvalidationIterator = requestCacheInvalidationIterator(request)
+      const canCache = cacheTime && !cacheInvalidationIterator
 
-    // Return from cache if possible.
-    if (canCache && cache.hasOwnProperty(cacheKey)) {
-      return Promise.resolve(cache[cacheKey].value)
-    }
+      if (cacheTime && cacheInvalidationIterator) {
+        console.warn('Requests that mutate/invalidate cache cannot be cached', request)
+      }
 
-    const result = source(request)
+      // Return from cache if possible.
+      if (canCache && cache.hasOwnProperty(cacheKey)) {
+        return Promise.resolve(cache[cacheKey].value)
+      }
 
-    // Add to cache if possible.
-    if (canCache) {
-      result.then(value =>
-        add(cacheKey, value, cacheTime)
-      )
-    }
+      const result = source(request)
 
-    // Invalidate cache if required.
-    if (cacheInvalidationIterator) {
-      result
-        // Ignore error, clearing cache is conservative option.
-        .catch(() => {})
-        .then(() => clear(cacheInvalidationIterator))
-    }
-
-    return result
-  }
-
-  return function bridgeNonReactiveSource(request, source) {
-    const {method} = request
-
-    if (method === 'OBSERVE') {
-      const key = requestCacheKey(request)
-      const read = () =>
-        fromPromise(
-          doRequest(observeToReadRequest(request), source)
+      // Add to cache if possible.
+      if (canCache) {
+        result.then(value =>
+          add(cacheKey, value, cacheTime)
         )
+      }
 
-      return merge(
-        cache.hasOwnProperty(key) ?
-          // Get directly from cache if available.
-          of(cache[key].value) :
-          // Or read immediately.
-          read(),
-        // And read again on expiry.
-        expiredKeys$
-          ::filter(k => k === key)
-          ::switchMap(read)
-      )
+      // Invalidate cache if required.
+      if (cacheInvalidationIterator) {
+        result
+          // Ignore error, clearing cache is conservative option.
+          .catch(() => {})
+          .then(() => clear(cacheInvalidationIterator))
+      }
+
+      return result
     }
 
-    else {
-      return doRequest(request, source)
+    return request => {
+      const {method} = request
+
+      if (method === 'OBSERVE') {
+        const key = requestCacheKey(request)
+        const read = () =>
+          fromPromise(
+            doRequest(observeToReadRequest(request), source)
+          )
+
+        return merge(
+          cache.hasOwnProperty(key) ?
+            // Get directly from cache if available.
+            of(cache[key].value) :
+            // Or read immediately.
+            read(),
+          // And read again on expiry.
+          expiredKeys$
+            ::filter(k => k === key)
+            ::switchMap(read)
+        )
+      }
+
+      else {
+        return doRequest(request, source)
+      }
     }
   }
 }

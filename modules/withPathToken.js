@@ -1,8 +1,12 @@
-import reject from './reject'
 import currentNextPath from './currentNextPath'
+import mapRequest from './mapRequest'
 
 // Returns wrapper source.
 export default function withPathToken(path) {
+  if (path.slice(0, 2) !== '/:') {
+    throw new Error('Token must start with "/:"')
+  }
+
   const key = path.slice(2)
 
   // Warn early if reserved key used.
@@ -10,17 +14,13 @@ export default function withPathToken(path) {
     throw new Error(`Key is reserved: ${key} (${path})`)
   }
 
-  return function withPathToken(request, source) {
+  return mapRequest(request => {
     const [current, next] = currentNextPath(request.path)
 
-    if (request.hasOwnProperty(key)) {
-      return reject(request, `withPathToken key ${key} clashes with existing request`)
+    return {
+      ...request,
+      path: next,
+      [key]: current
     }
-
-    return source({
-        ...request,
-        path: next,
-        [key]: current.slice(1)
-      })
-  }
+  })
 }

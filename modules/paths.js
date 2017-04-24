@@ -1,33 +1,19 @@
 import rejectNotFound from './rejectNotFound'
-import wrap from './wrap'
 import withPathToken from './withPathToken'
 import currentNextPath from './currentNextPath'
-import omitBy from 'lodash/omitBy'
+import omit from 'lodash/omit'
+import mapKeys from 'lodash/mapKeys'
 
-function routeRequest(paths, request, next = rejectNotFound) {
-  const [currentPath, nextPath] = currentNextPath(request.path)
+const isTokenPath = path => path[1] === ':'
 
-  if (paths.hasOwnProperty(currentPath)) {
-    return paths[currentPath]({
-      ...request,
-      path: nextPath
-    })
-  }
-
-  return next(request)
-}
-
-function isTokenPath(path) {
-  return path[1] === ':'
-}
-
-// Return wrappable source that delegates requests based on url.
+// Return source that branches requests based on url.
 // Supports one token path (e.g. '/:id'), all others are
 // matched exactly.
 // Token is added to the request using the given key.
 export default function paths(paths) {
   // Check paths.
   for (const path in paths) {
+    // Require / prefix to make it easier to understand that these are routes.
     if (path.indexOf('/') !== 0 || path.indexOf('/', 1) !== -1) {
       throw new Error(`Path key must start with and contain only one / (${path})`)
     }
@@ -36,24 +22,29 @@ export default function paths(paths) {
     }
   }
 
-  const tokenPath = Object.keys(paths).find(isTokenPath)
-
-  const staticPathSource = routeRequest.bind(null,
-    omitBy(paths, (v, k) => isTokenPath(k))
-  )
-
-  // Return static source if there is no token to handle.
-  if (!tokenPath) {
-    return staticPathSource
-  }
-
   if (Object.keys(paths).filter(isTokenPath).length > 1) {
     throw new Error('Paths can only have one token (/:key)')
   }
 
-  return wrap(
-    staticPathSource,
-    withPathToken(tokenPath),
-    paths[tokenPath]
-  )
+  const tokenPath = Object.keys(paths).find(isTokenPath)
+
+  const unknownPathSource = tokenPath ?
+    withPathToken(tokenPath)(paths[tokenPath]) :
+    rejectNotFound
+
+  // Remove token and / prefix.
+  const staticPaths = mapKeys(omit(paths, tokenPath), (v, k) => k.slice(1))
+
+  return request => {
+    const [currentPath, nextPath] = currentNextPath(request.path)
+
+    if (staticPaths.hasOwnProperty(currentPath)) {
+      return staticPaths[currentPath].call(null, {
+        ...request,
+        path: nextPath
+      })
+    }
+
+    return unknownPathSource(request)
+  }
 }

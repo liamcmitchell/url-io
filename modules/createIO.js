@@ -2,7 +2,7 @@ import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
 import {toPromise} from 'rxjs/operator/toPromise'
 import {take} from 'rxjs/operator/take'
-import wrap from './wrap'
+import compose from './compose'
 import tryCatch from './tryCatch'
 import cache from './cache'
 
@@ -12,7 +12,10 @@ export default function createIO(source) {
     throw new Error('Source must be a function')
   }
 
-  source = wrap(cache(), tryCatch, source)
+  source = compose(
+    cache(),
+    tryCatch(),
+  )(source)
 
   // Temp object representing observable url.
   // Can be consumed as observable or promise.
@@ -67,6 +70,10 @@ export default function createIO(source) {
       throw new Error("io requires a string path e.g. io(\'/path\')")
     }
 
+    if (request.path[0] !== '/') {
+      throw new Error("io requires path starting with a slash (/) e.g. io(\'/path\')")
+    }
+
     if (typeof request.method !== 'string') {
       throw new Error("io requires a string method e.g. io('/path', 'OBSERVE')")
     }
@@ -78,6 +85,8 @@ export default function createIO(source) {
     const finalRequest = {
       ...request,
       io,
+      // Only root io requires starting slash.
+      path: request.path.slice(1),
       originalPath: request.path
     }
 

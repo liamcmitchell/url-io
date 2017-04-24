@@ -1,4 +1,5 @@
 import isObservable from './isObservable'
+import reject from './reject'
 
 export default function methods(handlers) {
   handlers = Object.assign({}, handlers)
@@ -17,7 +18,7 @@ export default function methods(handlers) {
       return handler(request)
     }
     else {
-      throw new Error(`Method ${method} not supported`, request)
+      reject(request, new Error(`Method ${method} not supported`))
     }
   }
 }
