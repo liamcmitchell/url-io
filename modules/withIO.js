@@ -27,8 +27,9 @@ export default function withIO(urls) {
 
     const continueRequestWithValues = values =>
       source({
+        ...request,
+        // Resolved values overwrite request values.
         ...zipObject(keys(ioRequests), values),
-        ...request
       })
 
     return method === 'OBSERVE' ?
