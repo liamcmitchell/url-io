@@ -1,3 +1,4 @@
+export asyncSource from './asyncSource'
 export bridgeNonReactiveSource from './bridgeNonReactiveSource'
 export cache from './cache'
 export createIO from './createIO'
