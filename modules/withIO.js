@@ -1,5 +1,7 @@
 import isPlainObject from 'lodash/isPlainObject'
 import {switchMap} from 'rxjs/operator/switchMap'
+import {toPromise} from 'rxjs/operator/toPromise'
+import {take} from 'rxjs/operator/take'
 import keys from 'lodash/keys'
 import values from 'lodash/values'
 import mapValues from 'lodash/mapValues'
@@ -19,11 +21,15 @@ export default function withIO(urls) {
     }
 
     // Turn urls into observables if they aren't already.
-    const ioRequests = mapValues(urlsMap, url =>
-      typeof url.subscribe === 'function' ?
+    const ioRequests = mapValues(urlsMap, url => {
+      const observable = typeof url.subscribe === 'function' ?
         url :
         io(url)
-    )
+
+      return method === 'OBSERVE' ?
+        observable :
+        observable::take(1)::toPromise()
+    })
 
     const continueRequestWithValues = values =>
       source({
