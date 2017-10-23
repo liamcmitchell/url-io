@@ -1,6 +1,6 @@
 import {Subject} from 'rxjs/Subject'
-import {switchMap} from 'rxjs/operator/switchMap'
-import {filter} from 'rxjs/operator/filter'
+import {switchMap} from 'rxjs/operators/switchMap'
+import {filter} from 'rxjs/operators/filter'
 import {of} from 'rxjs/observable/of'
 import {merge} from 'rxjs/observable/merge'
 import {fromPromise} from 'rxjs/observable/fromPromise'
@@ -122,8 +122,10 @@ export default function bridgeNonReactiveSource(options = {}) {
             read(),
           // And read again on expiry.
           expiredKeys$
-            ::filter(k => k === key)
-            ::switchMap(read)
+            .pipe(
+              filter(k => k === key),
+              switchMap(read),
+            )
         )
       }
 

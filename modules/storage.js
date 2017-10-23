@@ -4,8 +4,8 @@ import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
 import {_throw} from 'rxjs/observable/throw'
 import {Subject} from 'rxjs/Subject'
-import {filter} from 'rxjs/operator/filter'
-import {pluck} from 'rxjs/operator/pluck'
+import {filter} from 'rxjs/operators/filter'
+import {pluck} from 'rxjs/operators/pluck'
 
 // Safe parse. Returning null should be safe, same result when key does not exist.
 function parse(string) {
@@ -46,8 +46,10 @@ export default function storage(Storage) {
         return merge(
           of(parse(Storage.getItem(key))),
           updates$
-            ::filter(u => u.key === key)
-            ::pluck('value')
+            .pipe(
+              filter(u => u.key === key),
+              pluck('value'),
+            )
         )
       },
       SET: function({key, params: {value}}) {

@@ -11,7 +11,7 @@ export default function location(history) {
     '/': methods({
       OBSERVE: () => Observable.create(observer => {
         observer.next(history.location)
-        return history.listen(::observer.next)
+        return history.listen(location => observer.next(location))
       }),
       PUSH: ({params}) => {
         history.push(params)

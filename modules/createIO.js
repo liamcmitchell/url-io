@@ -1,7 +1,6 @@
 import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
-import {toPromise} from 'rxjs/operator/toPromise'
-import {take} from 'rxjs/operator/take'
+import {take} from 'rxjs/operators/take'
 import compose from './compose'
 import tryCatch from './tryCatch'
 import cache from './cache'
@@ -37,11 +36,7 @@ export default function createIO(source) {
 
   // Allow use as promise.
   LazyIO.prototype.then = function() {
-    const p = source({
-      ...this.request,
-      // Allow sources to avoid watching.
-      single: true
-    })::take(1)::toPromise()
+    const p = source(this.request).pipe(take(1)).toPromise()
     return p.then.apply(p, arguments)
   }
 
@@ -67,11 +62,11 @@ export default function createIO(source) {
     }
 
     if (typeof request.path !== 'string') {
-      throw new Error("io requires a string path e.g. io(\'/path\')")
+      throw new Error("io requires a string path e.g. io('/path')")
     }
 
     if (request.path[0] !== '/') {
-      throw new Error("io requires path starting with a slash (/) e.g. io(\'/path\')")
+      throw new Error("io requires path starting with a slash (/) e.g. io('/path')")
     }
 
     if (typeof request.method !== 'string') {

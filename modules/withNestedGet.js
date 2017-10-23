@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import pathToArray from './pathToArray'
-import {map} from 'rxjs/operator/map'
+import {map} from 'rxjs/operators/map'
 
 // Given an existing path & value: /value -> {a: 1}
 // Allow accessing nested values: /value/a -> 1
@@ -19,8 +19,10 @@ export default function withNestedGet() {
           // Ask for the root.
           path: ''
         })
-          // And map to get nested val.
-          ::map(v => get(v, pathArray))
+          .pipe(
+            // And map to get nested val.
+            map(v => get(v, pathArray))
+          )
       }
     }
 

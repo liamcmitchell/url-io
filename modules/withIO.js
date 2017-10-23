@@ -1,7 +1,6 @@
 import isPlainObject from 'lodash/isPlainObject'
-import {switchMap} from 'rxjs/operator/switchMap'
-import {toPromise} from 'rxjs/operator/toPromise'
-import {take} from 'rxjs/operator/take'
+import {switchMap} from 'rxjs/operators/switchMap'
+import {take} from 'rxjs/operators/take'
 import keys from 'lodash/keys'
 import values from 'lodash/values'
 import mapValues from 'lodash/mapValues'
@@ -28,7 +27,7 @@ export default function withIO(urls) {
 
       return method === 'OBSERVE' ?
         observable :
-        observable::take(1)::toPromise()
+        observable.pipe(take(1)).toPromise()
     })
 
     const continueRequestWithValues = values =>
@@ -40,7 +39,9 @@ export default function withIO(urls) {
 
     return method === 'OBSERVE' ?
       combineLatest(values(ioRequests))
-        ::switchMap(continueRequestWithValues) :
+        .pipe(
+          switchMap(continueRequestWithValues),
+        ) :
       Promise.all(values(ioRequests))
         .then(continueRequestWithValues)
   }

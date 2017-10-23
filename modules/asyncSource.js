@@ -1,5 +1,5 @@
 import {fromPromise} from 'rxjs/observable/fromPromise'
-import {switchMap} from 'rxjs/operator/switchMap'
+import {switchMap} from 'rxjs/operators/switchMap'
 
 // Allow loading source async. Example:
 // asyncSource(() => import('lazySource').then(m => m.default))
@@ -18,7 +18,9 @@ export default function asyncSource(getSource) {
 
     return method === 'OBSERVE' ?
       fromPromise(sourcePromise)
-        ::switchMap(source => source(request)) :
+        .pipe(
+          switchMap(source => source(request)),
+        ) :
       sourcePromise
         .then(source => source(request))
   }

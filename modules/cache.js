@@ -1,8 +1,8 @@
 import {never} from 'rxjs/observable/never'
-import {_finally} from 'rxjs/operator/finally'
-import {merge} from 'rxjs/operator/merge'
-import {publishReplay} from 'rxjs/operator/publishReplay'
-import {distinctUntilChanged} from 'rxjs/operator/distinctUntilChanged'
+import {finalize} from 'rxjs/operators/finalize'
+import {merge} from 'rxjs/operators/merge'
+import {publishReplay} from 'rxjs/operators/publishReplay'
+import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
 
 export default function cache(cache = {}) {
   return source => request => {
@@ -18,15 +18,18 @@ export default function cache(cache = {}) {
     if (!cache[key]) {
       // Get observable from wrapped source.
       cache[key] = source(request)
-        // Only emit changes.
-        ::distinctUntilChanged()
-        // Ignore complete by merging never.
-        // We only want to remove from cache on unsubscribe.
-        ::merge(never())
-        // Remove from cache on unsubscribe or error.
-        ::_finally(() => { delete cache[key] })
-        // Share single copy of original observable.
-        ::publishReplay(1).refCount()
+        .pipe(
+          // Only emit changes.
+          distinctUntilChanged(),
+          // Ignore complete by merging never.
+          // We only want to remove from cache on unsubscribe.
+          merge(never()),
+          // Remove from cache on unsubscribe or error.
+          finalize(() => { delete cache[key] }),
+          // Share single copy of original observable.
+          publishReplay(1),
+        )
+        .refCount()
     }
 
     return cache[key]
