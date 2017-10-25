@@ -1,3 +1,5 @@
+import isFunction from 'lodash/isFunction'
+
 export default function isObservable(o) {
-  return o && typeof o.subscribe === 'function'
+  return o && isFunction(o.subscribe)
 }

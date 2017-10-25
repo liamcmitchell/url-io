@@ -1,3 +1,5 @@
+import isFunction from 'lodash/isFunction'
+
 export default function isPromise(o) {
-  return o && typeof o.then === 'function'
+  return o && isFunction(o.then)
 }

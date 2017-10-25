@@ -28,8 +28,7 @@
   "homepage": "https://github.com/liamcmitchell/url-io#readme",
   "dependencies": {
     "lodash": "^4.17.4",
-    "rxjs": "^5.5.0",
-    "symbol-observable": "^1.0.4"
+    "rxjs": "^5.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",

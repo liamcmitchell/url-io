@@ -1,17 +1,19 @@
+import isObservable from './isObservable'
 import isPlainObject from 'lodash/isPlainObject'
-import {switchMap} from 'rxjs/operators/switchMap'
-import {take} from 'rxjs/operators/take'
+import isFunction from 'lodash/isFunction'
 import keys from 'lodash/keys'
 import values from 'lodash/values'
 import mapValues from 'lodash/mapValues'
 import zipObject from 'lodash/zipObject'
 import {combineLatest} from 'rxjs/observable/combineLatest'
+import {switchMap} from 'rxjs/operators/switchMap'
+import {take} from 'rxjs/operators/take'
 
 export default function withIO(urls) {
   return source => request => {
     const {io, method} = request
 
-    const urlsMap = typeof urls === 'function' ?
+    const urlsMap = isFunction(urls) ?
       urls(request) :
       urls
 
@@ -21,7 +23,7 @@ export default function withIO(urls) {
 
     // Turn urls into observables if they aren't already.
     const ioRequests = mapValues(urlsMap, url => {
-      const observable = typeof url.subscribe === 'function' ?
+      const observable = isObservable(url) ?
         url :
         io(url)
 

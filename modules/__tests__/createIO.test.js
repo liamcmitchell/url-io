@@ -1,5 +1,4 @@
 import createIO from '../createIO'
-import $$observable from 'symbol-observable'
 import {Observable} from 'rxjs/Observable'
 import {of} from 'rxjs/observable/of'
 
@@ -29,7 +28,6 @@ describe('io', () => {
   test('returns observable (with promise method) for OBSERVE requests', () => {
     const result = io('/')
     expect(result.subscribe).toBeInstanceOf(Function)
-    expect(result[$$observable]().subscribe).toBeInstanceOf(Function)
     expect(result.then).toBeInstanceOf(Function)
   })
 
