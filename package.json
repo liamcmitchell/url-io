@@ -1,6 +1,6 @@
 {
   "name": "url-io",
-  "version": "4.1.3",
+  "version": "4.1.4",
   "description": "Data request API",
   "files": [
     "es6",
