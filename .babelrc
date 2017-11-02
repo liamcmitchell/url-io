@@ -1,18 +1,15 @@
 {
-  "presets": ["env", "stage-1"],
+  "presets": ["stage-1"],
   "env": {
+    "test": {
+      "presets": ["env"],
+    },
     "cjs": {
-      "presets": [
-        ["env", { "loose": true }],
-        "stage-1"
-      ],
+      "presets": ["env", {"loose": true}],
       "plugins": ["add-module-exports"]
     },
     "es": {
-      "presets": [
-        ["env", { "loose": true, "modules": false }],
-        "stage-1"
-      ]
+      "presets": [["env", {"loose": true, "modules": false}]]
     }
   }
 }
