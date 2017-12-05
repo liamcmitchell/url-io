@@ -5,11 +5,11 @@
       "presets": ["env"],
     },
     "cjs": {
-      "presets": [["env", {"loose": true}]],
+      "presets": ["env"],
       "plugins": ["add-module-exports"]
     },
     "es": {
-      "presets": [["env", {"loose": true, "modules": false}]]
+      "presets": [["env", {"modules": false}]]
     }
   }
 }
