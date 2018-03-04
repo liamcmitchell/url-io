@@ -1,11 +1,11 @@
-import methods from './methods'
+import {methods} from './methods'
 import {Observable} from 'rxjs/Observable'
 import pick from 'lodash/pick'
 
 const allowedOptions = ['enableHighAccuracy', 'maximumAge', 'timeout']
 
 // Produces an object that may contain a position or error property.
-export default methods({
+export const geolocation = methods({
   OBSERVE: ({params}) =>
     Observable.create((observer) => {
       if (!navigator.geolocation) {

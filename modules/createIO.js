@@ -3,12 +3,12 @@ import isPlainObject from 'lodash/isPlainObject'
 import isString from 'lodash/isString'
 import {Observable} from 'rxjs/Observable'
 import {take} from 'rxjs/operators/take'
-import compose from './compose'
-import tryCatch from './tryCatch'
-import cache from './cache'
+import {compose} from './compose'
+import {tryCatch} from './tryCatch'
+import {cache} from './cache'
 
 // Return consumer friendly API.
-export default function createIO(source) {
+export function createIO(source) {
   if (!isFunction(source)) {
     throw new Error('Source must be a function')
   }
@@ -36,7 +36,7 @@ export default function createIO(source) {
   // should be easier for consumers to work with.
   function io(requestOrPath, methodOrParams, params) {
     const request = isPlainObject(requestOrPath)
-      ? {...requestOrPath}
+      ? Object.assign({}, requestOrPath)
       : {path: requestOrPath}
 
     if (!isString(request.path)) {

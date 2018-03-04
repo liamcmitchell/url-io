@@ -1,8 +1,8 @@
-import currentNextPath from './currentNextPath'
-import mapRequest from './mapRequest'
+import {currentNextPath} from './currentNextPath'
+import {mapRequest} from './mapRequest'
 
 // Returns wrapper source.
-export default function withPathToken(path) {
+export function withPathToken(path) {
   if (path.slice(0, 2) !== '/:') {
     throw new Error('Token must start with "/:"')
   }
@@ -17,10 +17,9 @@ export default function withPathToken(path) {
   return mapRequest((request) => {
     const [current, next] = currentNextPath(request.path)
 
-    return {
-      ...request,
+    return Object.assign({}, request, {
       path: next,
       [key]: current,
-    }
+    })
   })
 }

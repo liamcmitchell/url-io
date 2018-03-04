@@ -6,10 +6,9 @@ import {merge} from 'rxjs/observable/merge'
 import {fromPromise} from 'rxjs/observable/fromPromise'
 
 function defaultObserveToReadRequest(request) {
-  return {
-    ...request,
+  return Object.assign({}, request, {
     method: 'GET',
-  }
+  })
 }
 
 function defaultRequestCacheKey({path, params}) {
@@ -27,7 +26,7 @@ function defaultRequestCacheInvalidationIterator({path, method}) {
 }
 
 // Converts observes to gets and manages cache.
-export default function bridgeNonReactiveSource(options = {}) {
+export function bridgeNonReactiveSource(options = {}) {
   const {
     cache = {},
     // request -> request

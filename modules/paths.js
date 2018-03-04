@@ -1,6 +1,6 @@
-import rejectNotFound from './rejectNotFound'
-import withPathToken from './withPathToken'
-import currentNextPath from './currentNextPath'
+import {rejectNotFound} from './rejectNotFound'
+import {withPathToken} from './withPathToken'
+import {currentNextPath} from './currentNextPath'
 import omit from 'lodash/omit'
 import mapKeys from 'lodash/mapKeys'
 
@@ -10,7 +10,7 @@ const isTokenPath = (path) => path[1] === ':'
 // Supports one token path (e.g. '/:id'), all others are
 // matched exactly.
 // Token is added to the request using the given key.
-export default function paths(paths) {
+export function paths(paths) {
   // Check paths.
   for (const path in paths) {
     // Require / prefix to make it easier to understand that these are routes.
@@ -41,10 +41,12 @@ export default function paths(paths) {
     const [currentPath, nextPath] = currentNextPath(request.path)
 
     if (staticPaths.hasOwnProperty(currentPath)) {
-      return staticPaths[currentPath].call(null, {
-        ...request,
-        path: nextPath,
-      })
+      return staticPaths[currentPath].call(
+        null,
+        Object.assign({}, request, {
+          path: nextPath,
+        })
+      )
     }
 
     return unknownPathSource(request)

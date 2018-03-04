@@ -1,5 +1,5 @@
-import methods from './methods'
-import paths from './paths'
+import {methods} from './methods'
+import {paths} from './paths'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
 import {_throw} from 'rxjs/observable/throw'
@@ -18,7 +18,7 @@ function parse(string) {
 
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
-export default function storage(Storage) {
+export function storage(Storage) {
   if (!Storage || !Storage.getItem || !Storage.setItem) {
     throw new Error('Storage interface required (localStorage/sessionStorage)')
   }

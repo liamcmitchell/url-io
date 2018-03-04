@@ -1,8 +1,8 @@
-import paths from './paths'
-import methods from './methods'
+import {paths} from './paths'
+import {methods} from './methods'
 import {Observable} from 'rxjs/Observable'
 
-export default function location(history) {
+export function location(history) {
   if (
     !history ||
     !history.location ||

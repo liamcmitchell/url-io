@@ -1,8 +1,8 @@
-import reject from './reject'
-import isObservable from './isObservable'
-import isPromise from './isPromise'
+import {reject} from './reject'
+import {isObservable} from './isObservable'
+import {isPromise} from './isPromise'
 
-export default function tryCatch() {
+export function tryCatch() {
   return (source) => (request) => {
     const {method, path} = request
     try {

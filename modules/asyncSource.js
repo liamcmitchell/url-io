@@ -3,7 +3,7 @@ import {switchMap} from 'rxjs/operators/switchMap'
 
 // Allow loading source async. Example:
 // asyncSource(() => import('lazySource').then(m => m.default))
-export default function asyncSource(getSource) {
+export function asyncSource(getSource) {
   let source = null
 
   return (request) => {

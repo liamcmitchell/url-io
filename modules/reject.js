@@ -1,6 +1,6 @@
 import {_throw} from 'rxjs/observable/throw'
 
-export default function reject(request, error) {
+export function reject(request, error) {
   const {method} = request
 
   if (!error) {

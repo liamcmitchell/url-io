@@ -1,3 +1,3 @@
-export default function mapRequest(mapper) {
+export function mapRequest(mapper) {
   return (source) => (request) => source(mapper(request))
 }

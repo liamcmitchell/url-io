@@ -1,4 +1,4 @@
-export default function compose(...funcs) {
+export function compose(...funcs) {
   if (funcs.length === 0) {
     return (arg) => arg
   }

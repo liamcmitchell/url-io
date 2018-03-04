@@ -1,3 +1,3 @@
-export default function pathToString(path) {
+export function pathToString(path) {
   return typeof path === 'string' ? path : path.join('/')
 }

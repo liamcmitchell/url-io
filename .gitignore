@@ -1,5 +1,3 @@
-node_modules
-npm-debug.log
-
-es6
-lib
+/node_modules
+/npm-debug.log
+/dist

@@ -1,4 +1,4 @@
-export default function currentNextPath(path) {
+export function currentNextPath(path) {
   const nextIndex = path.indexOf('/')
 
   if (nextIndex === -1) {

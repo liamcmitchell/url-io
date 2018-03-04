@@ -1,4 +1,4 @@
-import asyncSource from '../asyncSource'
+import {asyncSource} from '../asyncSource'
 import {of} from 'rxjs/observable/of'
 
 describe('asyncSource', () => {

@@ -1,4 +1,4 @@
-import bridgeNonReactiveSource from '../bridgeNonReactiveSource'
+import {bridgeNonReactiveSource} from '../bridgeNonReactiveSource'
 import {take} from 'rxjs/operators/take'
 import {bufferTime} from 'rxjs/operators/bufferTime'
 
@@ -12,9 +12,7 @@ describe('bridgeNonReactiveSource', () => {
     const wrappedSource = bridgeNonReactiveSource()(source)
 
     return wrappedSource({method: 'OBSERVE', path: ''})
-      .pipe(
-        take(1),
-      )
+      .pipe(take(1))
       .toPromise()
       .then((v) => {
         expect(v.method).toBe('GET')
@@ -27,10 +25,7 @@ describe('bridgeNonReactiveSource', () => {
     })(source)
 
     return wrappedSource({method: 'OBSERVE', path: ''})
-      .pipe(
-        bufferTime(30),
-        take(1),
-      )
+      .pipe(bufferTime(30), take(1))
       .toPromise()
       .then((emissions) => {
         expect(emissions.length).toBe(2)
@@ -44,10 +39,7 @@ describe('bridgeNonReactiveSource', () => {
     setTimeout(() => wrappedSource({method: 'CACHE_CLEAR'}), 10)
 
     return wrappedSource({method: 'OBSERVE', path: ''})
-      .pipe(
-        bufferTime(30),
-        take(1),
-      )
+      .pipe(bufferTime(30), take(1))
       .toPromise()
       .then((emissions) => {
         expect(emissions.length).toBe(2)

@@ -3,16 +3,13 @@
   "version": "4.1.5",
   "description": "Data request API",
   "files": [
-    "es6",
-    "lib"
+    "dist"
   ],
-  "main": "lib/index",
-  "module": "es6/index",
+  "main": "dist/url-io.js",
+  "module": "dist/url-io.es.js",
   "scripts": {
-    "build": "npm run build-cjs && npm run build-es",
-    "build-cjs": "rimraf lib && cross-env BABEL_ENV=cjs babel ./modules -d lib --ignore '__tests__'",
-    "build-es": "rimraf es6 && cross-env BABEL_ENV=es babel ./modules -d es6 --ignore '__tests__'",
-    "dev": "npm run build-es && fswatch -o modules | xargs -n1 -I{} cross-env BABEL_ENV=es babel ./modules -d es6 --ignore '__tests__'",
+    "build": "rimraf dist && rollup -c",
+    "dev": "onchange 'modules/**/*.js' -- rollup -c",
     "test": "jest",
     "prepublish": "npm run build",
     "precommit": "lint-staged",
@@ -47,21 +44,17 @@
     "rxjs": "^5.5.6"
   },
   "devDependencies": {
-    "babel-cli": "^6.9.0",
-    "babel-core": "^6.9.1",
-    "babel-eslint": "^8.2.2",
-    "babel-jest": "^21.2.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-jest": "^22.4.1",
     "babel-preset-env": "^1.6.1",
-    "babel-preset-stage-1": "^6.24.1",
-    "cross-env": "^5.1.3",
     "eslint": "^4.18.2",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-jest": "^21.12.3",
     "husky": "^0.14.3",
     "jest": "^21.2.1",
     "lint-staged": "^7.0.0",
+    "onchange": "^3.3.0",
     "prettier": "1.11.1",
-    "rimraf": "^2.5.2"
+    "rimraf": "^2.5.2",
+    "rollup": "^0.56.3"
   }
 }

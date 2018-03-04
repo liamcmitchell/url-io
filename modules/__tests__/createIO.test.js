@@ -1,4 +1,4 @@
-import createIO from '../createIO'
+import {createIO} from '../createIO'
 import {Observable} from 'rxjs/Observable'
 import {of} from 'rxjs/observable/of'
 
@@ -20,9 +20,7 @@ describe('io', () => {
 
     if (path === 'verybadsource') throw new Error('Broken')
 
-    return method === 'OBSERVE' ?
-      of(request) :
-      Promise.resolve(request)
+    return method === 'OBSERVE' ? of(request) : Promise.resolve(request)
   })
 
   test('returns observable (with promise method) for OBSERVE requests', () => {
@@ -101,25 +99,23 @@ describe('io', () => {
 })
 
 describe('observable cache', () => {
-  const io = createIO(() => new Observable((observer) => {
-    observer.next(Date.now())
-  }))
+  const io = createIO(
+    () =>
+      new Observable((observer) => {
+        observer.next(Date.now())
+      })
+  )
 
   test('shares observable for the same path', (done) => {
     let cachedValue
-    io('/one').subscribe((v) => cachedValue = v)
+    io('/one').subscribe((v) => (cachedValue = v))
 
     setTimeout(() => {
-      Promise.all([
-        io('/one'),
-        io('/two'),
-      ])
-      .then(([one, two]) => {
+      Promise.all([io('/one'), io('/two')]).then(([one, two]) => {
         expect(one).toBe(cachedValue)
         expect(two).not.toBe(cachedValue)
         done()
       })
     }, 100)
   })
-
 })

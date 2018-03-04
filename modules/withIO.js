@@ -1,4 +1,4 @@
-import isObservable from './isObservable'
+import {isObservable} from './isObservable'
 import isPlainObject from 'lodash/isPlainObject'
 import isFunction from 'lodash/isFunction'
 import keys from 'lodash/keys'
@@ -9,7 +9,7 @@ import {combineLatest} from 'rxjs/observable/combineLatest'
 import {switchMap} from 'rxjs/operators/switchMap'
 import {take} from 'rxjs/operators/take'
 
-export default function withIO(urls) {
+export function withIO(urls) {
   return (source) => (request) => {
     const {io, method} = request
 
@@ -29,11 +29,14 @@ export default function withIO(urls) {
     })
 
     const continueRequestWithValues = (values) =>
-      source({
-        ...request,
-        // Resolved values overwrite request values.
-        ...zipObject(keys(ioRequests), values),
-      })
+      source(
+        Object.assign(
+          {},
+          request,
+          // Resolved values overwrite request values.
+          zipObject(keys(ioRequests), values)
+        )
+      )
 
     return method === 'OBSERVE'
       ? combineLatest(values(ioRequests)).pipe(

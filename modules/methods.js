@@ -1,7 +1,7 @@
-import isObservable from './isObservable'
-import reject from './reject'
+import {isObservable} from './isObservable'
+import {reject} from './reject'
 
-export default function methods(handlers) {
+export function methods(handlers) {
   handlers = Object.assign({}, handlers)
 
   // Allow shorthand for defining observables.
