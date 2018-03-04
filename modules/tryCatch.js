@@ -3,7 +3,7 @@ import isObservable from './isObservable'
 import isPromise from './isPromise'
 
 export default function tryCatch() {
-  return source => request => {
+  return (source) => (request) => {
     const {method, path} = request
     try {
       const result = source(request)
@@ -14,8 +14,7 @@ export default function tryCatch() {
         return reject(request, `Source for ${path} didn't return Promise`)
       }
       return result
-    }
-    catch (error) {
+    } catch (error) {
       return reject(request, error)
     }
   }

@@ -6,7 +6,7 @@ import {switchMap} from 'rxjs/operators/switchMap'
 export default function asyncSource(getSource) {
   let source = null
 
-  return request => {
+  return (request) => {
     if (source) return source(request)
 
     const {method} = request
@@ -14,14 +14,10 @@ export default function asyncSource(getSource) {
     const sourcePromise = getSource()
 
     // Cache to avoid using promises every time.
-    sourcePromise.then(s => source = s)
+    sourcePromise.then((s) => (source = s))
 
-    return method === 'OBSERVE' ?
-      fromPromise(sourcePromise)
-        .pipe(
-          switchMap(source => source(request)),
-        ) :
-      sourcePromise
-        .then(source => source(request))
+    return method === 'OBSERVE'
+      ? fromPromise(sourcePromise).pipe(switchMap((source) => source(request)))
+      : sourcePromise.then((source) => source(request))
   }
 }

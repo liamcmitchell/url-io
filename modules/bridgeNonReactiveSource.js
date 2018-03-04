@@ -8,7 +8,7 @@ import {fromPromise} from 'rxjs/observable/fromPromise'
 function defaultObserveToReadRequest(request) {
   return {
     ...request,
-    method: 'GET'
+    method: 'GET',
   }
 }
 
@@ -22,7 +22,7 @@ function defaultRequestCacheTime({method}) {
 
 function defaultRequestCacheInvalidationIterator({path, method}) {
   if (method !== 'GET') {
-    return key => key.startsWith(path)
+    return (key) => key.startsWith(path)
   }
 }
 
@@ -37,7 +37,7 @@ export default function bridgeNonReactiveSource(options = {}) {
     // request -> string
     requestCacheKey = defaultRequestCacheKey,
     // request -> fn(string -> bool)
-    requestCacheInvalidationIterator = defaultRequestCacheInvalidationIterator
+    requestCacheInvalidationIterator = defaultRequestCacheInvalidationIterator,
   } = options
 
   const expiredKeys$ = new Subject()
@@ -50,33 +50,36 @@ export default function bridgeNonReactiveSource(options = {}) {
     cache[key] = {
       value,
       // Set timeout to remove itself on expiry.
-      expireTimeoutId: setTimeout(() => remove(key), expiry)
+      expireTimeoutId: setTimeout(() => remove(key), expiry),
     }
   }
 
-  const remove = key => {
+  const remove = (key) => {
     clearTimeout(cache[key].expireTimeoutId)
     delete cache[key]
     expiredKeys$.next(key)
   }
 
-  const clear = iterator => {
-    Object
-      .keys(cache)
+  const clear = (iterator) => {
+    Object.keys(cache)
       .filter(iterator)
-      .forEach(key => remove(key))
+      .forEach((key) => remove(key))
   }
 
-  return source => {
-
-    const doRequest = request => {
+  return (source) => {
+    const doRequest = (request) => {
       const cacheTime = requestCacheTime(request)
       const cacheKey = requestCacheKey(request)
-      const cacheInvalidationIterator = requestCacheInvalidationIterator(request)
+      const cacheInvalidationIterator = requestCacheInvalidationIterator(
+        request
+      )
       const canCache = cacheTime && !cacheInvalidationIterator
 
       if (cacheTime && cacheInvalidationIterator) {
-        console.warn('Requests that mutate/invalidate cache cannot be cached', request)
+        console.warn(
+          'Requests that mutate/invalidate cache cannot be cached',
+          request
+        )
       }
 
       // Return from cache if possible.
@@ -88,9 +91,7 @@ export default function bridgeNonReactiveSource(options = {}) {
 
       // Add to cache if possible.
       if (canCache) {
-        result.then(value =>
-          add(cacheKey, value, cacheTime)
-        )
+        result.then((value) => add(cacheKey, value, cacheTime))
       }
 
       // Invalidate cache if required.
@@ -104,32 +105,24 @@ export default function bridgeNonReactiveSource(options = {}) {
       return result
     }
 
-    return request => {
+    return (request) => {
       const {method} = request
 
       if (method === 'OBSERVE') {
         const key = requestCacheKey(request)
         const read = () =>
-          fromPromise(
-            doRequest(observeToReadRequest(request), source)
-          )
+          fromPromise(doRequest(observeToReadRequest(request), source))
 
         return merge(
-          cache.hasOwnProperty(key) ?
-            // Get directly from cache if available.
-            of(cache[key].value) :
-            // Or read immediately.
-            read(),
+          cache.hasOwnProperty(key)
+            ? // Get directly from cache if available.
+              of(cache[key].value)
+            : // Or read immediately.
+              read(),
           // And read again on expiry.
-          expiredKeys$
-            .pipe(
-              filter(k => k === key),
-              switchMap(read),
-            )
+          expiredKeys$.pipe(filter((k) => k === key), switchMap(read))
         )
-      }
-
-      else {
+      } else {
         return doRequest(request, source)
       }
     }

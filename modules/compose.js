@@ -1,6 +1,6 @@
 export default function compose(...funcs) {
   if (funcs.length === 0) {
-    return arg => arg
+    return (arg) => arg
   }
 
   if (funcs.length === 1) {

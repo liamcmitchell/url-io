@@ -13,7 +13,5 @@ export default function reject(request, error) {
 
   error.request = request
 
-  return method === 'OBSERVE' ?
-    _throw(error) :
-    Promise.reject(error)
+  return method === 'OBSERVE' ? _throw(error) : Promise.reject(error)
 }

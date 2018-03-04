@@ -14,13 +14,13 @@ export default function withPathToken(path) {
     throw new Error(`Key is reserved: ${key} (${path})`)
   }
 
-  return mapRequest(request => {
+  return mapRequest((request) => {
     const [current, next] = currentNextPath(request.path)
 
     return {
       ...request,
       path: next,
-      [key]: current
+      [key]: current,
     }
   })
 }

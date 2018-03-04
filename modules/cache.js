@@ -5,7 +5,7 @@ import {publishReplay} from 'rxjs/operators/publishReplay'
 import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
 
 export default function cache(cache = {}) {
-  return source => request => {
+  return (source) => (request) => {
     const {path, method, params} = request
 
     if (method !== 'OBSERVE') {
@@ -25,9 +25,11 @@ export default function cache(cache = {}) {
           // We only want to remove from cache on unsubscribe.
           merge(never()),
           // Remove from cache on unsubscribe or error.
-          finalize(() => { delete cache[key] }),
+          finalize(() => {
+            delete cache[key]
+          }),
           // Share single copy of original observable.
-          publishReplay(1),
+          publishReplay(1)
         )
         .refCount()
     }

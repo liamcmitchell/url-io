@@ -11,8 +11,7 @@ import {pluck} from 'rxjs/operators/pluck'
 function parse(string) {
   try {
     return JSON.parse(string)
-  }
-  catch (e) {
+  } catch (e) {
     return null
   }
 }
@@ -31,7 +30,7 @@ export default function storage(Storage) {
     if (storageArea === Storage) {
       updates$.next({
         key,
-        value: parse(newValue)
+        value: parse(newValue),
       })
     }
   })
@@ -45,11 +44,7 @@ export default function storage(Storage) {
 
         return merge(
           of(parse(Storage.getItem(key))),
-          updates$
-            .pipe(
-              filter(u => u.key === key),
-              pluck('value'),
-            )
+          updates$.pipe(filter((u) => u.key === key), pluck('value'))
         )
       },
       SET: function({key, params: {value}}) {
@@ -60,7 +55,7 @@ export default function storage(Storage) {
         Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
         updates$.next({key, value})
         return Promise.resolve()
-      }
-    })
+      },
+    }),
   })
 }

@@ -13,10 +13,7 @@ export default function createIO(source) {
     throw new Error('Source must be a function')
   }
 
-  source = compose(
-    cache(),
-    tryCatch(),
-  )(source)
+  source = compose(cache(), tryCatch())(source)
 
   class IoObservable extends Observable {
     constructor(request) {
@@ -38,16 +35,18 @@ export default function createIO(source) {
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
   function io(requestOrPath, methodOrParams, params) {
-    const request = isPlainObject(requestOrPath) ?
-      {...requestOrPath} :
-      {path: requestOrPath}
+    const request = isPlainObject(requestOrPath)
+      ? {...requestOrPath}
+      : {path: requestOrPath}
 
     if (!isString(request.path)) {
       throw new Error("io requires a string path e.g. io('/path')")
     }
 
     if (request.path[0] !== '/') {
-      throw new Error("io requires path starting with a slash (/) e.g. io('/path')")
+      throw new Error(
+        "io requires path starting with a slash (/) e.g. io('/path')"
+      )
     }
 
     // Save original path.
@@ -57,9 +56,7 @@ export default function createIO(source) {
     request.path = request.path.slice(1)
 
     if (!request.hasOwnProperty('method')) {
-      request.method = isString(methodOrParams) ?
-        methodOrParams :
-        'OBSERVE'
+      request.method = isString(methodOrParams) ? methodOrParams : 'OBSERVE'
     }
 
     if (!isString(request.method)) {
@@ -67,15 +64,15 @@ export default function createIO(source) {
     }
 
     if (!request.hasOwnProperty('params')) {
-      request.params = isPlainObject(methodOrParams) ?
-        methodOrParams :
-        isPlainObject(params) ?
-          params :
-          {}
+      request.params = isPlainObject(methodOrParams)
+        ? methodOrParams
+        : isPlainObject(params) ? params : {}
     }
 
     if (!isPlainObject(request.params)) {
-      throw new Error("io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})")
+      throw new Error(
+        "io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})"
+      )
     }
 
     // Add io to request to allow recursion.
@@ -84,9 +81,8 @@ export default function createIO(source) {
     // Observe requests return a lazy object that can be reused.
     if (request.method === 'OBSERVE') {
       return new IoObservable(request)
-    }
-    // All other requests send the request immediately and return a promise.
-    else {
+    } else {
+      // All other requests send the request immediately and return a promise.
       return source(request)
     }
   }

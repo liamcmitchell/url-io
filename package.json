@@ -14,7 +14,23 @@
     "build-es": "rimraf es6 && cross-env BABEL_ENV=es babel ./modules -d es6 --ignore '__tests__'",
     "dev": "npm run build-es && fswatch -o modules | xargs -n1 -I{} cross-env BABEL_ENV=es babel ./modules -d es6 --ignore '__tests__'",
     "test": "jest",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "precommit": "lint-staged",
+    "prepush": "npm test"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add",
+      "eslint"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": false,
+    "arrowParens": "always"
   },
   "repository": {
     "type": "git",
@@ -40,8 +56,12 @@
     "babel-preset-stage-1": "^6.24.1",
     "cross-env": "^5.1.3",
     "eslint": "^4.18.2",
+    "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-jest": "^21.12.3",
+    "husky": "^0.14.3",
     "jest": "^21.2.1",
+    "lint-staged": "^7.0.0",
+    "prettier": "1.11.1",
     "rimraf": "^2.5.2"
   }
 }

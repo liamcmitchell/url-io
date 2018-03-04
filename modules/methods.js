@@ -16,8 +16,7 @@ export default function methods(handlers) {
 
     if (handler) {
       return handler(request)
-    }
-    else {
+    } else {
       reject(request, new Error(`Method ${method} not supported`))
     }
   }

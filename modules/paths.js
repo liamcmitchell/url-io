@@ -4,7 +4,7 @@ import currentNextPath from './currentNextPath'
 import omit from 'lodash/omit'
 import mapKeys from 'lodash/mapKeys'
 
-const isTokenPath = path => path[1] === ':'
+const isTokenPath = (path) => path[1] === ':'
 
 // Return source that branches requests based on url.
 // Supports one token path (e.g. '/:id'), all others are
@@ -15,7 +15,9 @@ export default function paths(paths) {
   for (const path in paths) {
     // Require / prefix to make it easier to understand that these are routes.
     if (path.indexOf('/') !== 0 || path.indexOf('/', 1) !== -1) {
-      throw new Error(`Path key must start with and contain only one / (${path})`)
+      throw new Error(
+        `Path key must start with and contain only one / (${path})`
+      )
     }
     if (typeof paths[path] !== 'function') {
       throw new Error(`Path source must be a function (${path})`)
@@ -28,20 +30,20 @@ export default function paths(paths) {
 
   const tokenPath = Object.keys(paths).find(isTokenPath)
 
-  const unknownPathSource = tokenPath ?
-    withPathToken(tokenPath)(paths[tokenPath]) :
-    rejectNotFound
+  const unknownPathSource = tokenPath
+    ? withPathToken(tokenPath)(paths[tokenPath])
+    : rejectNotFound
 
   // Remove token and / prefix.
   const staticPaths = mapKeys(omit(paths, tokenPath), (v, k) => k.slice(1))
 
-  return request => {
+  return (request) => {
     const [currentPath, nextPath] = currentNextPath(request.path)
 
     if (staticPaths.hasOwnProperty(currentPath)) {
       return staticPaths[currentPath].call(null, {
         ...request,
-        path: nextPath
+        path: nextPath,
       })
     }
 

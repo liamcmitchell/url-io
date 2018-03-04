@@ -3,16 +3,26 @@ import methods from './methods'
 import {Observable} from 'rxjs/Observable'
 
 export default function location(history) {
-  if (!history || !history.location || !history.listen || !history.push || !history.replace || !history.goBack) {
-    throw new Error('history 4.x required: https://www.npmjs.com/package/history')
+  if (
+    !history ||
+    !history.location ||
+    !history.listen ||
+    !history.push ||
+    !history.replace ||
+    !history.goBack
+  ) {
+    throw new Error(
+      'history 4.x required: https://www.npmjs.com/package/history'
+    )
   }
 
   return paths({
     '/': methods({
-      OBSERVE: () => Observable.create(observer => {
-        observer.next(history.location)
-        return history.listen(location => observer.next(location))
-      }),
+      OBSERVE: () =>
+        Observable.create((observer) => {
+          observer.next(history.location)
+          return history.listen((location) => observer.next(location))
+        }),
       PUSH: ({params}) => {
         history.push(params)
         return Promise.resolve()
@@ -24,7 +34,7 @@ export default function location(history) {
       GO_BACK: () => {
         history.goBack()
         return Promise.resolve()
-      }
-    })
+      },
+    }),
   })
 }

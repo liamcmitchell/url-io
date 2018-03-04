@@ -11,6 +11,6 @@ export default function memory(initialValue) {
     SET: ({params: {value}}) => {
       subject$.next(value)
       return Promise.resolve()
-    }
+    },
   })
 }

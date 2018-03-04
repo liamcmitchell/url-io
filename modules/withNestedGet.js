@@ -7,7 +7,7 @@ import {map} from 'rxjs/operators/map'
 // This will return undefined for any non-existing path.
 // https://lodash.com/docs/4.17.4#get
 export default function withNestedGet() {
-  return source => request => {
+  return (source) => (request) => {
     const {method, path} = request
 
     if (method === 'OBSERVE') {
@@ -17,12 +17,11 @@ export default function withNestedGet() {
         return source({
           ...request,
           // Ask for the root.
-          path: ''
-        })
-          .pipe(
-            // And map to get nested val.
-            map(v => get(v, pathArray))
-          )
+          path: '',
+        }).pipe(
+          // And map to get nested val.
+          map((v) => get(v, pathArray))
+        )
       }
     }
 
