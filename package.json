@@ -1,6 +1,6 @@
 {
   "name": "url-io",
-  "version": "4.1.7",
+  "version": "4.2.0",
   "description": "Data request API",
   "files": [
     "dist"
