@@ -1,4 +1,5 @@
 export {asyncSource} from './asyncSource'
+export {branch} from './branch'
 export {bridgeNonReactiveSource} from './bridgeNonReactiveSource'
 export {cache} from './cache'
 export {createIO} from './createIO'
