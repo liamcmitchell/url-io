@@ -32,4 +32,15 @@ describe('asyncSource', () => {
         expect(sourceLoader).toHaveBeenCalledTimes(1)
       })
   })
+
+  test('supports source resolved as default export', () => {
+    const source = () => Promise.resolve(1)
+    const sourceLoadedAsync = asyncSource(() =>
+      Promise.resolve({default: source})
+    )
+
+    return sourceLoadedAsync({method: 'OTHER'}).then((v) => {
+      expect(v).toBe(1)
+    })
+  })
 })

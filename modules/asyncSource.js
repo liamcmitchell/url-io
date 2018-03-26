@@ -1,9 +1,16 @@
 import {fromPromise} from 'rxjs/observable/fromPromise'
 import {switchMap} from 'rxjs/operators/switchMap'
+import isFunction from 'lodash/isFunction'
 
-// Allow loading source async. Example:
-// asyncSource(() => import('lazySource').then(m => m.default))
+// Allow loading source async.
+// Function must return a promise that resolves to a source or
+// an object with source as the "default" property (ES module).
+// Example assuming source is default export:
+// asyncSource(() => import('lazySource'))
 export function asyncSource(getSource) {
+  if (!isFunction(getSource)) throw new Error('getSource must be a function')
+
+  // Cache to avoid using promises every time.
   let source = null
 
   return (request) => {
@@ -11,13 +18,16 @@ export function asyncSource(getSource) {
 
     const {method} = request
 
-    const sourcePromise = getSource()
+    const sourcePromise = getSource().then((result) => {
+      if (isFunction(result)) source = result
+      else if (isFunction(result.default)) source = result.default
+      else throw new Error('getSource must resolve to a function')
+    })
 
-    // Cache to avoid using promises every time.
-    sourcePromise.then((s) => (source = s))
+    const continueRequest = () => source(request)
 
     return method === 'OBSERVE'
-      ? fromPromise(sourcePromise).pipe(switchMap((source) => source(request)))
-      : sourcePromise.then((source) => source(request))
+      ? fromPromise(sourcePromise).pipe(switchMap(continueRequest))
+      : sourcePromise.then(continueRequest)
   }
 }
