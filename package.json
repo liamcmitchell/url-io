@@ -13,7 +13,7 @@
     "build": "rimraf dist && rollup -c",
     "dev": "rollup -c --watch",
     "test": "jest",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "precommit": "lint-staged",
     "prepush": "npm test"
   },
