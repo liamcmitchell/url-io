@@ -1,4 +1,4 @@
-import {methods} from './methods'
+import {methods} from './method'
 import {Observable} from 'rxjs/Observable'
 import pick from 'lodash/pick'
 
@@ -25,7 +25,7 @@ export const geolocation = methods({
         options
       )
 
-      return function dispose() {
+      return () => {
         navigator.geolocation.clearWatch(watchId)
       }
     }),

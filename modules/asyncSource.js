@@ -7,7 +7,7 @@ import isFunction from 'lodash/isFunction'
 // an object with source as the "default" property (ES module).
 // Example assuming source is default export:
 // asyncSource(() => import('lazySource'))
-export function asyncSource(getSource) {
+export const asyncSource = (getSource) => {
   if (!isFunction(getSource)) throw new Error('getSource must be a function')
 
   // Cache to avoid using promises every time.

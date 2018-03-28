@@ -2,7 +2,7 @@ import {reject} from './reject'
 import {isObservable} from './isObservable'
 import {isPromise} from './isPromise'
 
-export function tryCatch() {
+export const tryCatch = () => {
   return (source) => (request) => {
     const {method, path} = request
     try {

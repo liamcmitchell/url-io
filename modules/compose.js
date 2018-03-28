@@ -1,4 +1,4 @@
-export function compose(...funcs) {
+export const compose = (...funcs) => {
   if (funcs.length === 0) {
     return (arg) => arg
   }

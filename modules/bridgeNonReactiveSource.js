@@ -5,28 +5,28 @@ import {of} from 'rxjs/observable/of'
 import {merge} from 'rxjs/observable/merge'
 import {fromPromise} from 'rxjs/observable/fromPromise'
 
-function defaultObserveToReadRequest(request) {
+const defaultObserveToReadRequest = (request) => {
   return Object.assign({}, request, {
     method: 'GET',
   })
 }
 
-function defaultRequestCacheKey({path, params}) {
+const defaultRequestCacheKey = ({path, params}) => {
   return path + JSON.stringify(params)
 }
 
-function defaultRequestCacheTime({method}) {
+const defaultRequestCacheTime = ({method}) => {
   if (method === 'GET') return 10 * 60 * 1000
 }
 
-function defaultRequestCacheInvalidationIterator({path, method}) {
+const defaultRequestCacheInvalidationIterator = ({path, method}) => {
   if (method !== 'GET') {
     return (key) => key.startsWith(path)
   }
 }
 
 // Converts observes to gets and manages cache.
-export function bridgeNonReactiveSource(options = {}) {
+export const bridgeNonReactiveSource = (options = {}) => {
   const {
     cache = {},
     // request -> request

@@ -9,7 +9,7 @@ import {combineLatest} from 'rxjs/observable/combineLatest'
 import {switchMap} from 'rxjs/operators/switchMap'
 import {take} from 'rxjs/operators/take'
 
-export function withIO(urls) {
+export const withIO = (urls) => {
   return (source) => (request) => {
     const {io, method} = request
 

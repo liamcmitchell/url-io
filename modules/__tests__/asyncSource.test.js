@@ -16,9 +16,7 @@ describe('asyncSource', () => {
     const source = () => Promise.resolve(1)
     const sourceLoadedAsync = asyncSource(() => Promise.resolve(source))
 
-    return sourceLoadedAsync({method: 'OTHER'}).then((v) => {
-      expect(v).toBe(1)
-    })
+    return expect(sourceLoadedAsync({method: 'OTHER'})).resolves.toBe(1)
   })
 
   test('source load fn is cached', () => {
@@ -39,8 +37,6 @@ describe('asyncSource', () => {
       Promise.resolve({default: source})
     )
 
-    return sourceLoadedAsync({method: 'OTHER'}).then((v) => {
-      expect(v).toBe(1)
-    })
+    return expect(sourceLoadedAsync({method: 'OTHER'})).resolves.toBe(1)
   })
 })

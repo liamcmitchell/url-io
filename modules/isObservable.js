@@ -1,5 +1,3 @@
 import isFunction from 'lodash/isFunction'
 
-export function isObservable(o) {
-  return o && isFunction(o.subscribe)
-}
+export const isObservable = (o) => o && isFunction(o.subscribe)

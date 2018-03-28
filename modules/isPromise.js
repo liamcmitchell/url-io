@@ -1,5 +1,3 @@
 import isFunction from 'lodash/isFunction'
 
-export function isPromise(o) {
-  return o && isFunction(o.then)
-}
+export const isPromise = (o) => o && isFunction(o.then)

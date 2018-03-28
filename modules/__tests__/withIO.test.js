@@ -1,5 +1,5 @@
 import {createIO} from '../createIO'
-import {paths} from '../paths'
+import {paths} from '../path'
 import {withIO} from '../withIO'
 import {of} from 'rxjs/observable/of'
 

@@ -1,13 +1,14 @@
 import {_throw} from 'rxjs/observable/throw'
+import isString from 'lodash/isString'
 
-export function reject(request, error) {
+export const reject = (request, error) => {
   const {method} = request
 
   if (!error) {
     throw new Error('reject requires error')
   }
 
-  if (typeof error === 'string') {
+  if (isString(error)) {
     error = new Error(error)
   }
 

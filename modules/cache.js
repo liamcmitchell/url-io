@@ -4,7 +4,7 @@ import {merge} from 'rxjs/operators/merge'
 import {publishReplay} from 'rxjs/operators/publishReplay'
 import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
 
-export function cache(cache = {}) {
+export const cache = (cache = {}) => {
   return (source) => (request) => {
     const {path, method, params} = request
 

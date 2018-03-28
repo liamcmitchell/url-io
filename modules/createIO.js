@@ -8,7 +8,7 @@ import {tryCatch} from './tryCatch'
 import {cache} from './cache'
 
 // Return consumer friendly API.
-export function createIO(source) {
+export const createIO = (source) => {
   if (!isFunction(source)) {
     throw new Error('Source must be a function')
   }
@@ -34,7 +34,7 @@ export function createIO(source) {
 
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
-  function io(requestOrPath, methodOrParams, params) {
+  return function io(requestOrPath, methodOrParams, params) {
     const request = isPlainObject(requestOrPath)
       ? Object.assign({}, requestOrPath)
       : {path: requestOrPath}
@@ -86,6 +86,4 @@ export function createIO(source) {
       return source(request)
     }
   }
-
-  return io
 }

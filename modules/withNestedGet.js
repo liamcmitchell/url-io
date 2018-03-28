@@ -1,12 +1,12 @@
 import get from 'lodash/get'
-import {pathToArray} from './pathToArray'
+import {pathToArray} from './path'
 import {map} from 'rxjs/operators/map'
 
 // Given an existing path & value: /value -> {a: 1}
 // Allow accessing nested values: /value/a -> 1
 // This will return undefined for any non-existing path.
 // https://lodash.com/docs/4.17.4#get
-export function withNestedGet() {
+export const withNestedGet = () => {
   return (source) => (request) => {
     const {method, path} = request
 

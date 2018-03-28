@@ -3,20 +3,23 @@ export {branch} from './branch'
 export {bridgeNonReactiveSource} from './bridgeNonReactiveSource'
 export {cache} from './cache'
 export {createIO} from './createIO'
-export {currentNextPath} from './currentNextPath'
 export {geolocation} from './geolocation'
 export {compose} from './compose'
 export {location} from './location'
 export {mapRequest} from './mapRequest'
 export {memory} from './memory'
-export {methods} from './methods'
-export {paths} from './paths'
-export {pathToArray} from './pathToArray'
-export {pathToString} from './pathToString'
+export {methods, branchMethods} from './method'
+export {
+  paths,
+  branchPaths,
+  withPathToken,
+  currentNextPath,
+  pathToArray,
+  pathToString,
+} from './path'
 export {reject} from './reject'
 export {rejectNotFound} from './rejectNotFound'
 export {storage} from './storage'
 export {tryCatch} from './tryCatch'
 export {withIO} from './withIO'
 export {withNestedGet} from './withNestedGet'
-export {withPathToken} from './withPathToken'

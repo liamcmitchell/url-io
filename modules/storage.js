@@ -1,5 +1,5 @@
-import {methods} from './methods'
-import {paths} from './paths'
+import {methods} from './method'
+import {paths} from './path'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
 import {_throw} from 'rxjs/observable/throw'
@@ -8,7 +8,7 @@ import {filter} from 'rxjs/operators/filter'
 import {pluck} from 'rxjs/operators/pluck'
 
 // Safe parse. Returning null should be safe, same result when key does not exist.
-function parse(string) {
+const parse = (string) => {
   try {
     return JSON.parse(string)
   } catch (e) {
@@ -18,7 +18,7 @@ function parse(string) {
 
 // Requires storage interface.
 // https://developer.mozilla.org/en-US/docs/Web/API/Storage
-export function storage(Storage) {
+export const storage = (Storage) => {
   if (!Storage || !Storage.getItem || !Storage.setItem) {
     throw new Error('Storage interface required (localStorage/sessionStorage)')
   }
