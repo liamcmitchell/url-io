@@ -7,7 +7,7 @@ describe('paths', () => {
       '/a': () => 'a',
     })
 
-    expect(source({path: 'a'})).toBe('a')
+    expect(source({path: 'a'})).resolves.toBe('a')
     return expect(source({path: 'b'})).rejects.toThrow('found')
   })
 
@@ -16,7 +16,9 @@ describe('paths', () => {
       '/request': (request) => request,
     })
 
-    expect(source({path: 'request/nextPath'})).toEqual({path: 'nextPath'})
+    expect(source({path: 'request/nextPath'})).resolves.toEqual({
+      path: 'nextPath',
+    })
   })
 
   test('routes token path as expected', () => {
@@ -24,12 +26,12 @@ describe('paths', () => {
       '/:token': (request) => request,
     })
 
-    expect(source({path: 'thisPath/nextPath'})).toEqual({
+    expect(source({path: 'thisPath/nextPath'})).resolves.toEqual({
       token: 'thisPath',
       path: 'nextPath',
     })
 
-    expect(source({path: ''})).toEqual({
+    expect(source({path: ''})).resolves.toEqual({
       token: '',
       path: '',
     })

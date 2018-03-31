@@ -4,15 +4,11 @@ import {withIO} from '../withIO'
 import {of} from 'rxjs/observable/of'
 
 describe('withIO', () => {
-  const echoSource = (request) => {
-    const {method} = request
-
-    return method === 'OBSERVE' ? of(request) : Promise.resolve(request)
-  }
+  const echoSource = (request) => request
 
   const io = createIO(
     paths({
-      '/a': () => of('a'),
+      '/a': () => 'a',
       '/static': withIO({
         a: '/a',
       })(echoSource),

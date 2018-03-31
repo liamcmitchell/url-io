@@ -1,9 +1,16 @@
 import isFunction from 'lodash/isFunction'
+import {markSafeSource, createSafeSource} from './source'
 
 export const branch = (predicate, trueSource) => {
-  if (!isFunction(predicate) || !isFunction(trueSource))
-    throw new Error('predicate and trueSource must be functions')
+  if (!isFunction(predicate)) throw new Error('predicate must be a function')
 
-  return (falseSource) => (request) =>
-    predicate(request) ? trueSource(request) : falseSource(request)
+  return (falseSource) => {
+    trueSource = createSafeSource(trueSource)
+    falseSource = createSafeSource(falseSource)
+
+    return markSafeSource(
+      (request) =>
+        predicate(request) ? trueSource(request) : falseSource(request)
+    )
+  }
 }

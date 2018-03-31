@@ -25,15 +25,12 @@ export const location = (history) => {
         }),
       PUSH: ({params}) => {
         history.push(params)
-        return Promise.resolve()
       },
       REPLACE: ({params}) => {
         history.replace(params)
-        return Promise.resolve()
       },
       GO_BACK: () => {
         history.goBack()
-        return Promise.resolve()
       },
     }),
   })

@@ -3,9 +3,12 @@ import {take} from 'rxjs/operators/take'
 import {bufferTime} from 'rxjs/operators/bufferTime'
 
 describe('bridgeNonReactiveSource', () => {
-  const source = ({path, method}) => {
-    if (method === 'CACHE_CLEAR') return Promise.resolve()
-    return Promise.resolve({path, method})
+  const source = (request) => {
+    const {method} = request
+
+    if (method === 'CACHE_CLEAR') return
+
+    return request
   }
 
   test('turns OBSERVE into GET', () => {

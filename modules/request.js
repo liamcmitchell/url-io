@@ -10,9 +10,7 @@ export const reservedRequestKeys = [
 
 export const ensureRequestKey = (key) => {
   if (!isString(key) || !/^[a-z]/.test(key))
-    throw new Error(
-      `Request key must be a string starting matching /^[a-z]/ (${key})`
-    )
+    throw new Error(`Request key must be a string matching /^[a-z]/ (${key})`)
 
   if (reservedRequestKeys.includes(key))
     throw new Error(`Request key is reserved (${key})`)

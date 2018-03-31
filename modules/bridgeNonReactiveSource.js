@@ -3,7 +3,7 @@ import {switchMap} from 'rxjs/operators/switchMap'
 import {filter} from 'rxjs/operators/filter'
 import {of} from 'rxjs/observable/of'
 import {merge} from 'rxjs/observable/merge'
-import {fromPromise} from 'rxjs/observable/fromPromise'
+import {createSafeSource} from './source'
 
 const defaultObserveToReadRequest = (request) => {
   return Object.assign({}, request, {
@@ -66,6 +66,8 @@ export const bridgeNonReactiveSource = (options = {}) => {
   }
 
   return (source) => {
+    source = createSafeSource(source)
+
     const doRequest = (request) => {
       const cacheTime = requestCacheTime(request)
       const cacheKey = requestCacheKey(request)
@@ -104,26 +106,26 @@ export const bridgeNonReactiveSource = (options = {}) => {
       return result
     }
 
-    return (request) => {
+    return createSafeSource((request) => {
       const {method} = request
 
       if (method === 'OBSERVE') {
         const key = requestCacheKey(request)
-        const read = () =>
-          fromPromise(doRequest(observeToReadRequest(request), source))
 
-        return merge(
+        const read = () =>
           cache.hasOwnProperty(key)
             ? // Get directly from cache if available.
               of(cache[key].value)
             : // Or read immediately.
-              read(),
-          // And read again on expiry.
+              doRequest(observeToReadRequest(request), source)
+
+        return merge(
+          read(),
           expiredKeys$.pipe(filter((k) => k === key), switchMap(read))
         )
       } else {
         return doRequest(request, source)
       }
-    }
+    })
   }
 }

@@ -1,7 +1,7 @@
 import {rejectNotFound} from './rejectNotFound'
 import {ensureRequestKey} from './request'
 import isString from 'lodash/isString'
-import isFunction from 'lodash/isFunction'
+import {markSafeSource, createSafeSource} from './source'
 
 // Require / prefix to make it easier to understand that these are routes.
 const isPath = (path) =>
@@ -44,14 +44,16 @@ export const pathToArray = (path) =>
 
 export const pathToString = (path) => (isString(path) ? path : path.join('/'))
 
-export const withPathToken = (path) => {
+export const withPathToken = (path) => (source) => {
+  source = createSafeSource(source)
+
   ensureTokenPath(path)
 
   const key = tokenPathKey(path)
 
   ensureRequestKey(key)
 
-  return (source) => (request) => {
+  return (request) => {
     const {path} = request
 
     return source(
@@ -64,17 +66,16 @@ export const withPathToken = (path) => {
 }
 
 export const branchPaths = (paths) => (source) => {
+  source = createSafeSource(source)
+
   const sources = {}
+
   for (const path in paths) {
     ensurePath(path)
-
-    if (!isFunction(paths[path]))
-      throw new Error(`Path source must be a function (${path})`)
-
-    sources[pathPiece(path)] = paths[path]
+    sources[pathPiece(path)] = createSafeSource(paths[path], path)
   }
 
-  return (request) => {
+  return markSafeSource((request) => {
     const {path} = request
     const thisPath = currentPath(path)
 
@@ -88,7 +89,7 @@ export const branchPaths = (paths) => (source) => {
     }
 
     return source(request)
-  }
+  })
 }
 
 // Return source that branches requests based on url.

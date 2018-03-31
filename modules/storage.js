@@ -54,7 +54,6 @@ export const storage = (Storage) => {
 
         Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
         updates$.next({key, value})
-        return Promise.resolve()
       },
     }),
   })

@@ -1,9 +1,8 @@
 import {withNestedGet} from '../withNestedGet'
-import {of} from 'rxjs/observable/of'
 
 describe('withNestedGet', () => {
   test('routes request according to path', () => {
-    const source = withNestedGet()(() => of({a: 'a'}))
+    const source = withNestedGet()(() => ({a: 'a'}))
 
     return Promise.all([
       expect(

@@ -1,19 +1,15 @@
-import isFunction from 'lodash/isFunction'
 import isPlainObject from 'lodash/isPlainObject'
 import isString from 'lodash/isString'
 import {Observable} from 'rxjs/Observable'
 import {take} from 'rxjs/operators/take'
 import {compose} from './compose'
-import {tryCatch} from './tryCatch'
 import {cache} from './cache'
+import {createSafeSource} from './source'
 
 // Return consumer friendly API.
 export const createIO = (source) => {
-  if (!isFunction(source)) {
-    throw new Error('Source must be a function')
-  }
-
-  source = compose(cache(), tryCatch())(source)
+  // TODO: Move cache out
+  source = compose(cache(), createSafeSource)(source)
 
   class IoObservable extends Observable {
     constructor(request) {
@@ -78,8 +74,8 @@ export const createIO = (source) => {
     // Add io to request to allow recursion.
     request.io = io
 
-    // Observe requests return a lazy object that can be reused.
     if (request.method === 'OBSERVE') {
+      // Observe requests return an observable.
       return new IoObservable(request)
     } else {
       // All other requests send the request immediately and return a promise.

@@ -1,6 +1,5 @@
 import {createIO} from '../createIO'
 import {Observable} from 'rxjs/Observable'
-import {of} from 'rxjs/observable/of'
 
 describe('createIO', () => {
   test('returns function', () => {
@@ -14,13 +13,13 @@ describe('createIO', () => {
 
 describe('io', () => {
   const io = createIO((request) => {
-    const {method, path} = request
+    const {path} = request
 
     if (path === 'badsource') return
 
     if (path === 'verybadsource') throw new Error('Broken')
 
-    return method === 'OBSERVE' ? of(request) : Promise.resolve(request)
+    return request
   })
 
   test('returns observable (with promise method) for OBSERVE requests', () => {
@@ -86,7 +85,7 @@ describe('io', () => {
   })
 
   test('handles sources returning non-Promise for non-OBSERVE', () => {
-    return expect(io('/badsource', 'OTHER')).rejects.toBeDefined()
+    return expect(io('/badsource', 'OTHER')).resolves.toBeUndefined()
   })
 
   test('handles sources throwing errors for OBSERVE', () => {

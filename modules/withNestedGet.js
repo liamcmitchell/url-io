@@ -1,13 +1,16 @@
 import get from 'lodash/get'
 import {pathToArray} from './path'
 import {map} from 'rxjs/operators/map'
+import {markSafeSource, createSafeSource} from './source'
 
 // Given an existing path & value: /value -> {a: 1}
 // Allow accessing nested values: /value/a -> 1
 // This will return undefined for any non-existing path.
 // https://lodash.com/docs/4.17.4#get
-export const withNestedGet = () => {
-  return (source) => (request) => {
+export const withNestedGet = () => (source) => {
+  source = createSafeSource(source)
+
+  return markSafeSource((request) => {
     const {method, path} = request
 
     if (method === 'OBSERVE') {
@@ -27,5 +30,5 @@ export const withNestedGet = () => {
     }
 
     return source(request)
-  }
+  })
 }

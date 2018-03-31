@@ -10,7 +10,6 @@ export const memory = (initialValue) => {
     OBSERVE: () => subject$,
     SET: ({params: {value}}) => {
       subject$.next(value)
-      return Promise.resolve()
     },
   })
 }

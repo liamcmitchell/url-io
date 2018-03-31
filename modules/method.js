@@ -1,34 +1,36 @@
 import {isObservable} from './isObservable'
 import {rejectNotFound} from './rejectNotFound'
 import isString from 'lodash/isString'
-import isFunction from 'lodash/isFunction'
+import {markSafeSource, createSafeSource} from './source'
 
 const isMethod = (method) => isString(method) && /^[A-Z_]+$/.test(method)
 
 const ensureMethod = (method) => {
   if (!isMethod(method))
-    throw new Error('Method must upper case with underscores')
+    throw new Error('Method must be upper case with underscores')
 }
 
+const createObservableSource = (observable) => () => observable
+
 export const branchMethods = (methods) => (source) => {
+  source = createSafeSource(source)
+
   const sources = {}
+
   for (const method in methods) {
     ensureMethod(method)
 
-    let methodSource = methods[method]
+    const methodSource = methods[method]
 
     // Allow shorthand for defining observables.
     if (method === 'OBSERVE' && isObservable(methodSource)) {
-      methodSource = () => methods[method]
+      sources[method] = createObservableSource(methodSource)
+    } else {
+      sources[method] = createSafeSource(methodSource, method)
     }
-
-    if (!isFunction(methodSource))
-      throw new Error(`Method source must be a function (${method})`)
-
-    sources[method] = methodSource
   }
 
-  return (request) => {
+  return markSafeSource((request) => {
     const {method} = request
 
     const methodSource = sources.hasOwnProperty(method)
@@ -36,7 +38,7 @@ export const branchMethods = (methods) => (source) => {
       : source
 
     return methodSource(request)
-  }
+  })
 }
 
 export const methods = (methods) => {

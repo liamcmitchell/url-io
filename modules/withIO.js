@@ -8,9 +8,12 @@ import zipObject from 'lodash/zipObject'
 import {combineLatest} from 'rxjs/observable/combineLatest'
 import {switchMap} from 'rxjs/operators/switchMap'
 import {take} from 'rxjs/operators/take'
+import {createSafeSource} from './source'
 
-export const withIO = (urls) => {
-  return (source) => (request) => {
+export const withIO = (urls) => (source) => {
+  source = createSafeSource(source)
+
+  return createSafeSource((request) => {
     const {io, method} = request
 
     const urlsMap = isFunction(urls) ? urls(request) : urls
@@ -43,5 +46,5 @@ export const withIO = (urls) => {
           switchMap(continueRequestWithValues)
         )
       : Promise.all(values(ioRequests)).then(continueRequestWithValues)
-  }
+  })
 }

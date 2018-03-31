@@ -14,8 +14,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+* Observe results are wrapped in Rx.Observable.of() (if not undefined or observable).
+* Non-observe responses are wrapped in Promise.resolve().
+
 ### Deprecated
 
 * currentNextPath
+* tryCatch
+* paths
+* methods
 
 ### Removed

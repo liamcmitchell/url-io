@@ -7,7 +7,7 @@ describe('branch', () => {
     const falseSource = () => false
     const source = branch(predicate, trueSource)(falseSource)
 
-    expect(source({path: 'true'})).toBe(true)
-    expect(source({path: 'false'})).toBe(false)
+    expect(source({path: 'true'})).resolves.toBe(true)
+    expect(source({path: 'false'})).resolves.toBe(false)
   })
 })

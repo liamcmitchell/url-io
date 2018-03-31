@@ -20,6 +20,6 @@ export {
 export {reject} from './reject'
 export {rejectNotFound} from './rejectNotFound'
 export {storage} from './storage'
-export {tryCatch} from './tryCatch'
+export {tryCatch} from './source'
 export {withIO} from './withIO'
 export {withNestedGet} from './withNestedGet'
