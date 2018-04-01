@@ -3,12 +3,13 @@ import {paths} from './path'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
 import {_throw} from 'rxjs/observable/throw'
+import {fromEventPattern} from 'rxjs/observable/fromEventPattern'
 import {Subject} from 'rxjs/Subject'
 import {filter} from 'rxjs/operators/filter'
-import {pluck} from 'rxjs/operators/pluck'
+import {map} from 'rxjs/operators/map'
 
 // Safe parse. Returning null should be safe, same result when key does not exist.
-const parse = (string) => {
+const safeParse = (string) => {
   try {
     return JSON.parse(string)
   } catch (e) {
@@ -23,37 +24,40 @@ export const storage = (Storage) => {
     throw new Error('Storage interface required (localStorage/sessionStorage)')
   }
 
-  const updates$ = new Subject()
+  const localUpdates$ = new Subject()
 
-  // TODO: Cleanup? Do we really need to clean up one listener?
-  window.addEventListener('storage', ({storageArea, key, newValue}) => {
-    if (storageArea === Storage) {
-      updates$.next({
-        key,
-        value: parse(newValue),
-      })
-    }
-  })
+  const updates$ = merge(
+    localUpdates$,
+    fromEventPattern(
+      (handler) => window.addEventListener('storage', handler),
+      (handler) => window.removeEventListener('storage', handler)
+    ).pipe(filter(({storageArea}) => storageArea === Storage))
+  )
 
   return paths({
     '/:key': methods({
-      OBSERVE: function({key}) {
+      OBSERVE: ({key}) => {
         if (!key) {
           return _throw(new Error('Key required for Storage'))
         }
 
         return merge(
-          of(parse(Storage.getItem(key))),
-          updates$.pipe(filter((u) => u.key === key), pluck('value'))
-        )
+          of(Storage.getItem(key)),
+          updates$.pipe(
+            filter((u) => u.key === key),
+            map(({newValue}) => newValue)
+          )
+        ).pipe(map(safeParse))
       },
-      SET: function({key, params: {value}}) {
+      SET: ({key, params: {value}}) => {
         if (!key) {
           return Promise.reject(new Error('Key required for Storage'))
         }
 
-        Storage.setItem(key, JSON.stringify(value === undefined ? null : value))
-        updates$.next({key, value})
+        value = JSON.stringify(value === undefined ? null : value)
+
+        Storage.setItem(key, value)
+        localUpdates$.next({key, newValue: value})
       },
     }),
   })
