@@ -2,7 +2,7 @@ import {fromPromise} from 'rxjs/observable/fromPromise'
 import {switchMap} from 'rxjs/operators/switchMap'
 import isFunction from 'lodash/isFunction'
 import {markSafeSource, createSafeSource} from './source'
-import {isObserve} from './isObserve'
+import {isObserveRequest} from './request'
 
 // Allow loading source async.
 // Function must return a promise that resolves to a source or
@@ -29,7 +29,7 @@ export const asyncSource = (getSource) => {
 
     const continueRequest = () => source(request)
 
-    return isObserve(request)
+    return isObserveRequest(request)
       ? fromPromise(sourcePromise).pipe(switchMap(continueRequest))
       : sourcePromise.then(continueRequest)
   })

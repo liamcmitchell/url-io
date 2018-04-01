@@ -1,5 +1,4 @@
-import {paths} from './path'
-import {methods} from './method'
+import {routes} from './routes'
 import {Observable} from 'rxjs/Observable'
 
 export const location = (history) => {
@@ -16,22 +15,20 @@ export const location = (history) => {
     )
   }
 
-  return paths({
-    '/': methods({
-      OBSERVE: () =>
-        Observable.create((observer) => {
-          observer.next(history.location)
-          return history.listen((location) => observer.next(location))
-        }),
-      PUSH: ({params}) => {
-        history.push(params)
-      },
-      REPLACE: ({params}) => {
-        history.replace(params)
-      },
-      GO_BACK: () => {
-        history.goBack()
-      },
-    }),
+  return routes({
+    OBSERVE: () =>
+      Observable.create((observer) => {
+        observer.next(history.location)
+        return history.listen((location) => observer.next(location))
+      }),
+    PUSH: ({params}) => {
+      history.push(params)
+    },
+    REPLACE: ({params}) => {
+      history.replace(params)
+    },
+    GO_BACK: () => {
+      history.goBack()
+    },
   })
 }

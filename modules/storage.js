@@ -1,8 +1,6 @@
-import {methods} from './method'
-import {paths} from './path'
+import {routes} from './routes'
 import {merge} from 'rxjs/observable/merge'
 import {of} from 'rxjs/observable/of'
-import {_throw} from 'rxjs/observable/throw'
 import {fromEventPattern} from 'rxjs/observable/fromEventPattern'
 import {Subject} from 'rxjs/Subject'
 import {filter} from 'rxjs/operators/filter'
@@ -34,13 +32,9 @@ export const storage = (Storage) => {
     ).pipe(filter(({storageArea}) => storageArea === Storage))
   )
 
-  return paths({
-    '/:key': methods({
+  return routes({
+    '/:key': {
       OBSERVE: ({key}) => {
-        if (!key) {
-          return _throw(new Error('Key required for Storage'))
-        }
-
         return merge(
           of(Storage.getItem(key)),
           updates$.pipe(
@@ -50,15 +44,11 @@ export const storage = (Storage) => {
         ).pipe(map(safeParse))
       },
       SET: ({key, params: {value}}) => {
-        if (!key) {
-          return Promise.reject(new Error('Key required for Storage'))
-        }
-
         value = JSON.stringify(value === undefined ? null : value)
 
         Storage.setItem(key, value)
         localUpdates$.next({key, newValue: value})
       },
-    }),
+    },
   })
 }

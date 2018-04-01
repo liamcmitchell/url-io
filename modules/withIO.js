@@ -9,7 +9,7 @@ import {combineLatest} from 'rxjs/observable/combineLatest'
 import {switchMap} from 'rxjs/operators/switchMap'
 import {take} from 'rxjs/operators/take'
 import {createSafeSource} from './source'
-import {isObserve} from './isObserve'
+import {isObserveRequest} from './request'
 
 export const withIO = (urls) => (source) => {
   source = createSafeSource(source)
@@ -27,7 +27,7 @@ export const withIO = (urls) => (source) => {
     const ioRequests = mapValues(urlsMap, (url) => {
       const observable = isObservable(url) ? url : io(url)
 
-      return isObserve(request)
+      return isObserveRequest(request)
         ? observable
         : observable.pipe(take(1)).toPromise()
     })
@@ -42,7 +42,7 @@ export const withIO = (urls) => (source) => {
         )
       )
 
-    return isObserve(request)
+    return isObserveRequest(request)
       ? combineLatest(values(ioRequests)).pipe(
           switchMap(continueRequestWithValues)
         )

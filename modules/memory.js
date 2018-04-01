@@ -1,4 +1,4 @@
-import {methods} from './method'
+import {routes} from './routes'
 import {BehaviorSubject} from 'rxjs/BehaviorSubject'
 
 // Store value using BehaviorSubject.
@@ -6,7 +6,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject'
 export const memory = (initialValue) => {
   const subject$ = new BehaviorSubject(initialValue)
 
-  return methods({
+  return routes({
     OBSERVE: () => subject$,
     SET: ({params: {value}}) => {
       subject$.next(value)

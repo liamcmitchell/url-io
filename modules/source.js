@@ -2,14 +2,13 @@ import isFunction from 'lodash/isFunction'
 import {reject} from './reject'
 import {isObservable} from './isObservable'
 import {of} from 'rxjs/observable/of'
-import {isObserve} from './isObserve'
+import {isObserveRequest} from './request'
 
 export const isSource = isFunction
 
 export const ensureSource = (source, name) => {
   if (!isSource(source)) {
-    name = name ? `(${name})` : ''
-    throw new Error(`Source must be a function ${name}`)
+    throw new Error(`Source must be a function ${name ? `(${name})` : ''}`)
   }
 }
 
@@ -30,7 +29,7 @@ export const createSafeSource = (source, name) => {
     try {
       const result = source(request)
 
-      if (isObserve(request)) {
+      if (isObserveRequest(request)) {
         if (result === undefined)
           throw new Error(
             `Source for ${method} ${originalPath} didn't return anything. If you really want to return undefined, wrap it as an observable.`

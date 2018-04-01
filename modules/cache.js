@@ -4,7 +4,7 @@ import {merge} from 'rxjs/operators/merge'
 import {publishReplay} from 'rxjs/operators/publishReplay'
 import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
 import {markSafeSource, createSafeSource} from './source'
-import {isObserve} from './isObserve'
+import {isObserveRequest} from './request'
 
 export const cache = (cache = {}) => (source) => {
   source = createSafeSource(source)
@@ -12,7 +12,7 @@ export const cache = (cache = {}) => (source) => {
   return markSafeSource((request) => {
     const {path, params} = request
 
-    if (!isObserve(request)) {
+    if (!isObserveRequest(request)) {
       return source(request)
     }
 

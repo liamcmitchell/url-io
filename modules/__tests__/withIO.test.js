@@ -1,5 +1,5 @@
 import {createIO} from '../createIO'
-import {paths} from '../path'
+import {routes} from '../routes'
 import {withIO} from '../withIO'
 import {of} from 'rxjs/observable/of'
 
@@ -7,7 +7,7 @@ describe('withIO', () => {
   const echoSource = (request) => request
 
   const io = createIO(
-    paths({
+    routes({
       '/a': () => 'a',
       '/static': withIO({
         a: '/a',

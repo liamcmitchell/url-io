@@ -15,3 +15,5 @@ export const ensureRequestKey = (key) => {
   if (reservedRequestKeys.includes(key))
     throw new Error(`Request key is reserved (${key})`)
 }
+
+export const isObserveRequest = (request) => request.method === 'OBSERVE'

@@ -4,7 +4,7 @@ import isString from 'lodash/isString'
 import {markSafeSource, createSafeSource} from './source'
 
 // Require / prefix to make it easier to understand that these are routes.
-const isPath = (path) =>
+export const isPath = (path) =>
   isString(path) && path[0] === '/' && path.indexOf('/', 1) === -1
 
 const ensurePath = (path) => {
@@ -53,7 +53,7 @@ export const withPathToken = (path) => (source) => {
 
   ensureRequestKey(key)
 
-  return (request) => {
+  return markSafeSource((request) => {
     const {path} = request
 
     return source(
@@ -62,7 +62,7 @@ export const withPathToken = (path) => (source) => {
         [key]: currentPath(path),
       })
     )
-  }
+  })
 }
 
 export const branchPaths = (paths) => (source) => {
