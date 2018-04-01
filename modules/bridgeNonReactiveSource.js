@@ -4,6 +4,7 @@ import {filter} from 'rxjs/operators/filter'
 import {of} from 'rxjs/observable/of'
 import {merge} from 'rxjs/observable/merge'
 import {createSafeSource} from './source'
+import {isObserve} from './isObserve'
 
 const defaultObserveToReadRequest = (request) => {
   return Object.assign({}, request, {
@@ -99,9 +100,7 @@ export const bridgeNonReactiveSource = ({
   }
 
   return createSafeSource((request) => {
-    const {method} = request
-
-    if (method === 'OBSERVE') {
+    if (isObserve(request)) {
       const key = requestCacheKey(request)
 
       const read = () =>

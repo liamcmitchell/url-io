@@ -1,9 +1,8 @@
 import {_throw} from 'rxjs/observable/throw'
 import isString from 'lodash/isString'
+import {isObserve} from './isObserve'
 
 export const reject = (request, error) => {
-  const {method} = request
-
   if (!error) {
     throw new Error('reject requires error')
   }
@@ -14,5 +13,5 @@ export const reject = (request, error) => {
 
   error.request = request
 
-  return method === 'OBSERVE' ? _throw(error) : Promise.reject(error)
+  return isObserve(request) ? _throw(error) : Promise.reject(error)
 }

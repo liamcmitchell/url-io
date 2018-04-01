@@ -2,8 +2,9 @@ import {isObservable} from './isObservable'
 import {rejectNotFound} from './rejectNotFound'
 import isString from 'lodash/isString'
 import {markSafeSource, createSafeSource} from './source'
+import {isObserve} from './isObserve'
 
-const isMethod = (method) => isString(method) && /^[A-Z_]+$/.test(method)
+export const isMethod = (method) => isString(method) && /^[A-Z_]+$/.test(method)
 
 const ensureMethod = (method) => {
   if (!isMethod(method))
@@ -23,7 +24,7 @@ export const branchMethods = (methods) => (source) => {
     const methodSource = methods[method]
 
     // Allow shorthand for defining observables.
-    if (method === 'OBSERVE' && isObservable(methodSource)) {
+    if (isObserve(method) && isObservable(methodSource)) {
       sources[method] = createObservableSource(methodSource)
     } else {
       sources[method] = createSafeSource(methodSource, method)

@@ -5,6 +5,7 @@ import {take} from 'rxjs/operators/take'
 import {compose} from './compose'
 import {cache} from './cache'
 import {createSafeSource} from './source'
+import {isObserve} from './isObserve'
 
 // Return consumer friendly API.
 export const createIO = (source) => {
@@ -74,7 +75,7 @@ export const createIO = (source) => {
     // Add io to request to allow recursion.
     request.io = io
 
-    if (request.method === 'OBSERVE') {
+    if (isObserve(request)) {
       // Observe requests return an observable.
       return new IoObservable(request)
     } else {

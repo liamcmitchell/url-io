@@ -2,6 +2,7 @@ import get from 'lodash/get'
 import {pathToArray} from './path'
 import {map} from 'rxjs/operators/map'
 import {markSafeSource, createSafeSource} from './source'
+import {isObserve} from './isObserve'
 
 // Given an existing path & value: /value -> {a: 1}
 // Allow accessing nested values: /value/a -> 1
@@ -11,9 +12,9 @@ export const withNestedGet = () => (source) => {
   source = createSafeSource(source)
 
   return markSafeSource((request) => {
-    const {method, path} = request
+    const {path} = request
 
-    if (method === 'OBSERVE') {
+    if (isObserve(request)) {
       const pathArray = pathToArray(path)
 
       if (pathArray.length) {
