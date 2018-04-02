@@ -45,8 +45,17 @@ describe('io', () => {
   })
 
   test('handles shorthand arguments', () => {
-    return io('/path', 'METHOD', {var: 1}).then((request) => {
-      expect(request).toEqual({
+    return Promise.all([
+      expect(io('/path', {var: 1})).resolves.toEqual({
+        io,
+        path: 'path',
+        originalPath: '/path',
+        method: 'OBSERVE',
+        params: {
+          var: 1,
+        },
+      }),
+      expect(io('/path', 'METHOD', {var: 1})).resolves.toEqual({
         io,
         path: 'path',
         originalPath: '/path',
@@ -54,8 +63,8 @@ describe('io', () => {
         params: {
           var: 1,
         },
-      })
-    })
+      }),
+    ])
   })
 
   test('handles full request argument', () => {

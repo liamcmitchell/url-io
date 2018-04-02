@@ -1,5 +1,5 @@
 import {isObservable} from './isObservable'
-import isPlainObject from 'lodash/isPlainObject'
+import isObjectLike from 'lodash/isObjectLike'
 import isFunction from 'lodash/isFunction'
 import keys from 'lodash/keys'
 import values from 'lodash/values'
@@ -19,7 +19,7 @@ export const withIO = (urls) => (source) => {
 
     const urlsMap = isFunction(urls) ? urls(request) : urls
 
-    if (!isPlainObject(urlsMap)) {
+    if (!isObjectLike(urlsMap)) {
       throw new Error('withIO requires a map of io objects/requests')
     }
 

@@ -1,4 +1,4 @@
-import isPlainObject from 'lodash/isPlainObject'
+import isObjectLike from 'lodash/isObjectLike'
 import isString from 'lodash/isString'
 import {Observable} from 'rxjs/Observable'
 import {take} from 'rxjs/operators/take'
@@ -30,7 +30,7 @@ export const createIO = (source) => {
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
   return function io(requestOrPath, methodOrParams, params) {
-    const request = isPlainObject(requestOrPath)
+    const request = isObjectLike(requestOrPath)
       ? Object.assign({}, requestOrPath)
       : {path: requestOrPath}
 
@@ -59,12 +59,12 @@ export const createIO = (source) => {
     }
 
     if (!request.hasOwnProperty('params')) {
-      request.params = isPlainObject(methodOrParams)
+      request.params = isObjectLike(methodOrParams)
         ? methodOrParams
-        : isPlainObject(params) ? params : {}
+        : isObjectLike(params) ? params : {}
     }
 
-    if (!isPlainObject(request.params)) {
+    if (!isObjectLike(request.params)) {
       throw new Error(
         "io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})"
       )

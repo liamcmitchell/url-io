@@ -13,6 +13,8 @@ export {
   paths,
   branchPaths,
   withPathToken,
+  currentPath,
+  nextPath,
   currentNextPath,
   pathToArray,
   pathToString,
