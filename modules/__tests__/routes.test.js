@@ -19,7 +19,6 @@ describe('routes', () => {
 
     return Promise.all([
       expect(source({path: '', method: 'GET_A'})).resolves.toBe('a'),
-      expect(source({path: 'other', method: 'GET_A'})).rejects.toThrow('found'),
       expect(source({path: '', method: 'OTHER'})).rejects.toThrow('found'),
     ])
   })
@@ -38,14 +37,10 @@ describe('routes', () => {
       '/:token': (request) => request,
     })
 
-    return Promise.all([
-      expect(source({path: 'thisPath/nextPath'})).resolves.toEqual({
-        token: 'thisPath',
-        path: 'nextPath',
-      }),
-
-      expect(source({path: ''})).rejects.toThrow('found'),
-    ])
+    return expect(source({path: 'thisPath/nextPath'})).resolves.toEqual({
+      token: 'thisPath',
+      path: 'nextPath',
+    })
   })
 
   test('throws if more than one token path is defined', () => {
@@ -61,42 +56,25 @@ describe('routes', () => {
     const echoSource = (request) => request
 
     const source = routes({
-      METHOD: echoSource,
-      '/path': echoSource,
-      '/nested': {
+      '/': {
         METHOD: echoSource,
-        '/path': echoSource,
+      },
+      '/nested': {
         '/:token': echoSource,
       },
-      '/:token': echoSource,
     })
 
     return Promise.all([
-      expect(source({path: ''})).rejects.toThrow('found'),
+      expect(source({path: '', METHOD: 'OTHER'})).rejects.toThrow('found'),
 
-      expect(source({method: 'METHOD', path: ''})).resolves.toEqual({
+      expect(source({path: '', method: 'METHOD'})).resolves.toEqual({
+        path: '',
         method: 'METHOD',
-        path: '',
-      }),
-
-      expect(source({path: 'path'})).resolves.toEqual({
-        path: '',
-      }),
-
-      expect(source({path: 'token/next'})).resolves.toEqual({
-        path: 'next',
-        token: 'token',
-      }),
-
-      expect(source({path: 'nested'})).rejects.toThrow('found'),
-
-      expect(source({path: 'nested', method: 'METHOD'})).resolves.toEqual({
-        method: 'METHOD',
-        path: '',
       }),
 
       expect(source({path: 'nested/path'})).resolves.toEqual({
         path: '',
+        token: 'path',
       }),
 
       expect(source({path: 'nested/token/next'})).resolves.toEqual({

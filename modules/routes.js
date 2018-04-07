@@ -1,54 +1,23 @@
-import {rejectNotFound} from './rejectNotFound'
-import {isSource} from './source'
-import {isPath, isTokenPath, withPathToken, branchPaths} from './path'
-import {isMethod, branchMethods} from './method'
+import {isPath, paths} from './path'
+import {methods} from './method'
+import isObjectLike from 'lodash/isObjectLike'
+import mapValues from 'lodash/mapValues'
 
-// Combines branchMethods, branchPaths and withPathToken to make an
-// easier to use router that should cover most needs.
-// See tests for examples.
+const makeRoutes = (sourceOrRoutes) =>
+  isObjectLike(sourceOrRoutes) ? routes(sourceOrRoutes) : sourceOrRoutes
+
+// Combines methods & paths to make an easier to use router that should
+// cover most needs. See tests for examples.
 export const routes = (routesObject) => {
-  if (typeof routesObject !== 'object')
+  if (!isObjectLike(routesObject))
     throw new Error('routes must receive an object')
 
-  const pathSources = {}
-  let methodSources
-  let tokenSource
+  const keys = Object.keys(routesObject)
 
-  for (const key in routesObject) {
-    const route = routesObject[key]
+  if (!keys.some(isPath)) return methods(routesObject)
 
-    if (isMethod(key)) {
-      if (!methodSources) methodSources = {}
+  if (!keys.every(isPath))
+    throw new Error(`Can't define methods and paths on the same level.`)
 
-      // Pass in as-is to allow observe shorthand.
-      methodSources[key] = route
-    } else {
-      // Allow nested routes.
-      const source = isSource(route) ? route : routes(route)
-
-      if (isTokenPath(key)) {
-        if (tokenSource)
-          throw new Error(`Only one token route allowed (${key})`)
-
-        tokenSource = withPathToken(key)(source)
-      } else if (isPath(key)) {
-        pathSources[key] = source
-      } else {
-        throw new Error(`Unknown route (${key})`)
-      }
-    }
-  }
-
-  // We make sure a root handler is defined (even if rejectNotFound) to prevent
-  // root requests going to tokenSource.
-  if (pathSources['/']) {
-    if (methodSources)
-      throw new Error(`Can't define methods and root (/) at the same time.`)
-  } else {
-    pathSources['/'] = methodSources
-      ? branchMethods(methodSources)(rejectNotFound)
-      : rejectNotFound
-  }
-
-  return branchPaths(pathSources)(tokenSource || rejectNotFound)
+  return paths(mapValues(routesObject, makeRoutes))
 }
