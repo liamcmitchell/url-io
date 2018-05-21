@@ -1,84 +1,47 @@
-import isObjectLike from 'lodash/isObjectLike'
-import isString from 'lodash/isString'
-import {Observable} from 'rxjs/Observable'
-import {take} from 'rxjs/operators/take'
-import {cache} from './cache'
+import {toRequest, isObserveRequest, cacheKey} from './request'
+import {IOObservable} from './IOObservable'
 import {createSafeSource} from './source'
-import {isObserveRequest} from './request'
+import debounce from 'lodash/debounce'
+import keys from 'lodash/keys'
 
 // Return consumer friendly API.
 export const createIO = (source) => {
-  source = cache()(createSafeSource(source))
+  source = createSafeSource(source)
 
-  class IoObservable extends Observable {
-    constructor(request) {
-      super()
-      this.request = request
-    }
+  const cache = {}
 
-    _subscribe(subscriber) {
-      return source(this.request).subscribe(subscriber)
-    }
-
-    // Allow use as promise.
-    then() {
-      const promise = this.pipe(take(1)).toPromise()
-      return promise.then.apply(promise, arguments)
-    }
-  }
+  const cleanCache = debounce(() => {
+    keys(cache).forEach((key) => {
+      const observable = cache[key]
+      if (observable._refCount <= 0) {
+        delete cache[key]
+        delete observable.cleanCache
+        observable.disconnect()
+      }
+    })
+  })
 
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
   return function io(requestOrPath, methodOrParams, params) {
-    const request = isObjectLike(requestOrPath)
-      ? Object.assign({}, requestOrPath)
-      : {path: requestOrPath}
-
-    if (!isString(request.path)) {
-      throw new Error("io requires a string path e.g. io('/path')")
-    }
-
-    if (request.path[0] !== '/') {
-      throw new Error(
-        "io requires path starting with a slash (/) e.g. io('/path')"
-      )
-    }
-
-    // Save original path.
-    request.originalPath = request.path
-
-    // Remove starting slash (only required at root).
-    request.path = request.path.slice(1)
-
-    if (!request.hasOwnProperty('method')) {
-      request.method = isString(methodOrParams) ? methodOrParams : 'OBSERVE'
-    }
-
-    if (!isString(request.method)) {
-      throw new Error("io requires a string method e.g. io('/path', 'OBSERVE')")
-    }
-
-    if (!request.hasOwnProperty('params')) {
-      request.params = isObjectLike(methodOrParams)
-        ? methodOrParams
-        : isObjectLike(params) ? params : {}
-    }
-
-    if (!isObjectLike(request.params)) {
-      throw new Error(
-        "io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})"
-      )
-    }
+    const request = toRequest(requestOrPath, methodOrParams, params)
 
     // Add io to request to allow recursion.
     request.io = io
 
-    if (isObserveRequest(request)) {
-      // Observe requests return an observable.
-      return new IoObservable(request)
-    } else {
-      // All other requests send the request immediately and return a promise.
+    if (!isObserveRequest(request)) {
       return source(request)
     }
+
+    const key = cacheKey(request)
+
+    // If there is nothing in the cache, add it.
+    if (!cache.hasOwnProperty(key)) {
+      cache[key] = new IOObservable(source(request), cleanCache)
+      // And call clean just in case it is requested but never used.
+      cleanCache()
+    }
+
+    return cache[key]
   }
 }

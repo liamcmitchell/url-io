@@ -6,6 +6,7 @@ import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
 import {markSafeSource, createSafeSource} from './source'
 import {isObserveRequest} from './request'
 
+// Deprecated. To remove in next major version.
 export const cache = (cache = {}) => (source) => {
   source = createSafeSource(source)
 
