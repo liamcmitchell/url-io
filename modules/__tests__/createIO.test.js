@@ -110,20 +110,17 @@ describe('observable cache', () => {
   const io = createIO(
     () =>
       new Observable((observer) => {
-        observer.next(Date.now())
+        observer.next({})
       })
   )
 
-  test('shares observable for the same path', (done) => {
+  test('shares observable for the same path', () => {
     let cachedValue
     io('/one').subscribe((v) => (cachedValue = v))
 
-    setTimeout(() => {
-      Promise.all([io('/one'), io('/two')]).then(([one, two]) => {
-        expect(one).toBe(cachedValue)
-        expect(two).not.toBe(cachedValue)
-        done()
-      })
-    }, 100)
+    return Promise.all([io('/one'), io('/two')]).then(([one, two]) => {
+      expect(one).toBe(cachedValue)
+      expect(two).not.toBe(cachedValue)
+    })
   })
 })

@@ -1,4 +1,4 @@
-import isFunction from 'lodash/isFunction'
+import {isFunction} from './util'
 import {markSafeSource, createSafeSource} from './source'
 
 export const branch = (predicate, trueSource) => {

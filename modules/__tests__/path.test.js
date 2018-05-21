@@ -1,11 +1,14 @@
 import {
   isPath,
   currentPath,
+  currentNextPath,
   nextPath,
   isTokenPath,
   withPathToken,
   branchPaths,
   paths,
+  pathToArray,
+  pathToString,
 } from '../path'
 
 describe('isPath', () => {
@@ -38,10 +41,37 @@ describe('nextPath', () => {
   })
 })
 
+describe('currentNextPath', () => {
+  test('returns path up to the next slash', () => {
+    expect(currentNextPath('')).toEqual(['', ''])
+    expect(currentNextPath('first')).toEqual(['first', ''])
+    expect(currentNextPath('first/second')).toEqual(['first', 'second'])
+    expect(currentNextPath('first/second/third')).toEqual([
+      'first',
+      'second/third',
+    ])
+    expect(currentNextPath('/x')).toEqual(['', 'x'])
+  })
+})
+
 describe('isTokenPath', () => {
   test('requires path starting with colon', () => {
     expect(isTokenPath('/path')).toBe(false)
     expect(isTokenPath('/:path')).toBe(true)
+  })
+})
+
+describe('pathToArray', () => {
+  test('converts path to arry', () => {
+    expect(pathToArray('one/two')).toEqual(['one', 'two'])
+    expect(pathToArray(['one', 'two'])).toEqual(['one', 'two'])
+  })
+})
+
+describe('pathToString', () => {
+  test('converts path to string', () => {
+    expect(pathToString('one/two')).toEqual('one/two')
+    expect(pathToString(['one', 'two'])).toEqual('one/two')
   })
 })
 
@@ -69,6 +99,14 @@ describe('withPathToken', () => {
 })
 
 describe('branchPaths', () => {
+  test('throws if path is not valid', () => {
+    expect(() =>
+      branchPaths({
+        'bad/a': (request) => request,
+      })(() => false)
+    ).toThrow()
+  })
+
   test('branches request according to path', () => {
     const source = branchPaths({
       '/a': (request) => request,

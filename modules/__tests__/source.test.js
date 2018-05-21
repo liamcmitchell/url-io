@@ -4,6 +4,7 @@ import {
   isSafeSource,
   markSafeSource,
   createSafeSource,
+  tryCatch,
 } from '../source'
 import {of} from 'rxjs/observable/of'
 
@@ -18,6 +19,7 @@ describe('ensureSource', () => {
   test('throws if source is not a function', () => {
     expect(ensureSource(() => {})).toBeUndefined()
     expect(() => ensureSource()).toThrow('function')
+    expect(() => ensureSource(null, 'name')).toThrow('name')
   })
 })
 
@@ -87,5 +89,11 @@ describe('createSafeSource', () => {
   test('safeSource returns promise when source returns other than promise', () => {
     const source = createSafeSource(() => true)
     expect(source({method: 'OTHER'})).resolves.toBe(true)
+  })
+})
+
+describe('tryCatch', () => {
+  test('returns createSafeSource', () => {
+    expect(tryCatch()).toBe(createSafeSource)
   })
 })

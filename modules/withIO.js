@@ -1,7 +1,5 @@
-import {isObservable} from './isObservable'
 import isObjectLike from 'lodash/isObjectLike'
-import isFunction from 'lodash/isFunction'
-import keys from 'lodash/keys'
+import {isFunction, isObservable} from './util'
 import values from 'lodash/values'
 import mapValues from 'lodash/mapValues'
 import zipObject from 'lodash/zipObject'
@@ -38,7 +36,7 @@ export const withIO = (urls) => (source) => {
           {},
           request,
           // Resolved values overwrite request values.
-          zipObject(keys(ioRequests), values)
+          zipObject(Object.keys(ioRequests), values)
         )
       )
 

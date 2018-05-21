@@ -26,7 +26,7 @@ export const nextPath = (path) => {
   return index === -1 ? '' : path.slice(index + 1)
 }
 
-// TODO: Remove
+// Deprecated.
 export const currentNextPath = (path) => [currentPath(path), nextPath(path)]
 
 export const isTokenPath = (path) => isPath(path) && path[1] === ':'

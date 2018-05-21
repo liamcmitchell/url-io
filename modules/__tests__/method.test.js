@@ -1,4 +1,5 @@
 import {isMethod, isObserveMethod, branchMethods, methods} from '../method'
+import {of} from 'rxjs/observable/of'
 
 describe('isMethod', () => {
   test('requires all caps string', () => {
@@ -32,6 +33,14 @@ describe('branchMethods', () => {
 })
 
 describe('methods', () => {
+  test('throws if non-method key given', () => {
+    expect(() =>
+      methods({
+        ' ': () => null,
+      })
+    ).toThrow()
+  })
+
   test('routes request according to method', () => {
     const source = methods({
       OBSERVE: () => 'OBSERVE',
@@ -52,5 +61,13 @@ describe('methods', () => {
     return Promise.all([
       expect(source({method: 'OTHER'})).resolves.toBe('OTHER'),
     ])
+  })
+
+  test('allows observable shorthand', () => {
+    const source = methods({
+      OBSERVE: of(1),
+    })
+
+    return expect(source({method: 'OBSERVE'}).toPromise()).resolves.toBe(1)
   })
 })

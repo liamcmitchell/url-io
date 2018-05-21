@@ -1,6 +1,6 @@
 import {fromPromise} from 'rxjs/observable/fromPromise'
 import {switchMap} from 'rxjs/operators/switchMap'
-import isFunction from 'lodash/isFunction'
+import {isFunction} from './util'
 import {markSafeSource, createSafeSource} from './source'
 import {isObserveRequest} from './request'
 

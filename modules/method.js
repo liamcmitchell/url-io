@@ -1,4 +1,4 @@
-import {isObservable} from './isObservable'
+import {isObservable} from './util'
 import {rejectNotFound} from './rejectNotFound'
 import isString from 'lodash/isString'
 import {markSafeSource, createSafeSource} from './source'

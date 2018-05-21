@@ -18,8 +18,13 @@ describe('withIO', () => {
       '/observable': withIO({
         a: of('a'),
       })(echoSource),
+      '/broken': withIO()(echoSource),
     })
   )
+
+  test('throws if object not given', () => {
+    return expect(io('/broken')).rejects.toThrow('requests')
+  })
 
   test('resolves nested static io request for OBSERVE', () => {
     return expect(io('/static')).resolves.toMatchObject({a: 'a'})

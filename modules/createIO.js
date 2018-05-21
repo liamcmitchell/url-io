@@ -2,7 +2,6 @@ import {toRequest, isObserveRequest, cacheKey} from './request'
 import {IOObservable} from './IOObservable'
 import {createSafeSource} from './source'
 import debounce from 'lodash/debounce'
-import keys from 'lodash/keys'
 
 // Return consumer friendly API.
 export const createIO = (source) => {
@@ -10,8 +9,9 @@ export const createIO = (source) => {
 
   const cache = {}
 
+  // istanbul ignore next
   const cleanCache = debounce(() => {
-    keys(cache).forEach((key) => {
+    Object.keys(cache).forEach((key) => {
       const observable = cache[key]
       if (observable._refCount <= 0) {
         delete cache[key]

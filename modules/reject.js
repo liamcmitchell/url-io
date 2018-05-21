@@ -7,6 +7,7 @@ export const reject = (request, error) => {
     throw new Error('reject requires error')
   }
 
+  // Deprecated.
   if (isString(error)) {
     error = new Error(error)
   }

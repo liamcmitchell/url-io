@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+### Fixed
+
+* bridgeNonReactiveSource caches on creation, not result
+
 ### Changed
 
 * Rewrote createIO and root cache.
@@ -14,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Deprecated
 
 * cache
+* reject error passed as string
 
 ## 4.4.1 - 2018-04-07
 

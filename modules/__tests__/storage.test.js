@@ -17,6 +17,10 @@ class MockStorage {
 }
 
 describe('storage', () => {
+  test('throws if storage interface not provided', () => {
+    expect(() => storage()).toThrow()
+  })
+
   test('gets storage value', () => {
     const source = storage(new MockStorage({key: 'true'}))
 
@@ -25,6 +29,16 @@ describe('storage', () => {
         .pipe(take(1))
         .toPromise()
     ).resolves.toBe(true)
+  })
+
+  test('reads bad JSON value as null', () => {
+    const source = storage(new MockStorage({key: '!!!!'}))
+
+    return expect(
+      source({method: 'OBSERVE', path: 'key'})
+        .pipe(take(1))
+        .toPromise()
+    ).resolves.toBe(null)
   })
 
   test('updates storage value', () => {

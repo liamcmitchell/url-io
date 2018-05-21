@@ -1,6 +1,6 @@
-import isFunction from 'lodash/isFunction'
+import {isFunction} from './util'
 import {reject} from './reject'
-import {isObservable} from './isObservable'
+import {isObservable} from './util'
 import {of} from 'rxjs/observable/of'
 import {isObserveRequest} from './request'
 
@@ -47,5 +47,5 @@ export const createSafeSource = (source, name) => {
   })
 }
 
-// TODO: Remove
+// Deprecated.
 export const tryCatch = () => createSafeSource

@@ -40,20 +40,25 @@ export const bridgeNonReactiveSource = ({
 } = {}) => (source) => {
   source = createSafeSource(source)
 
-  const expiredKeys$ = new Subject()
+  const invalidatedKeys$ = new Subject()
 
   const remove = (key) => {
     clearTimeout(cache[key].expireTimeoutId)
     delete cache[key]
-    expiredKeys$.next(key)
   }
 
-  const doRequest = (request) => {
+  const invalidate = (key) => {
+    remove(key)
+    invalidatedKeys$.next(key)
+  }
+
+  const doRequest = (request, canReturnSyncObservable) => {
     const expires = requestCacheTime(request)
     const key = requestCacheKey(request)
     const cacheInvalidationIterator = requestCacheInvalidationIterator(request)
     const canCache = expires && !cacheInvalidationIterator
 
+    // istanbul ignore next
     if (expires && cacheInvalidationIterator) {
       console.warn(
         'Requests that mutate/invalidate cache cannot be cached',
@@ -61,61 +66,75 @@ export const bridgeNonReactiveSource = ({
       )
     }
 
-    // Return from cache if possible.
-    if (canCache && cache.hasOwnProperty(key)) {
-      return Promise.resolve(cache[key].value)
-    }
-
-    const result = source(request)
-
-    // Add to cache if possible.
     if (canCache) {
-      result.then((value) => {
-        // May already have been added, remove older value.
-        if (cache[key]) {
-          clearTimeout(cache[key].expireTimeoutId)
-        }
+      if (!cache.hasOwnProperty(key)) {
+        // Create cache object.
+        const cacheEntry = (cache[key] = {})
 
-        cache[key] = {
-          value,
-          // Set timeout to remove itself on expiry.
-          expireTimeoutId: setTimeout(() => remove(key), expires),
-        }
-      })
+        // Invalidate on expiry.
+        cacheEntry.expireTimeoutId = setTimeout(() => {
+          // istanbul ignore else
+          if (cache[key] === cacheEntry) invalidate(key)
+        }, expires)
+
+        // Do request.
+        cacheEntry.promise = source(request).then(
+          // Save observable value so we can return it synchronously.
+          (value) => {
+            cacheEntry.observable = of(value)
+            return value
+          },
+          // Remove self on error.
+          (error) => {
+            // istanbul ignore else
+            if (cache[key] === cacheEntry) remove(key)
+            throw error
+          }
+        )
+      }
+
+      const cacheEntry = cache[key]
+
+      if (canReturnSyncObservable && cacheEntry.observable)
+        return cacheEntry.observable
+
+      return cacheEntry.promise
     }
+
+    const promise = source(request)
 
     // Invalidate cache if required.
     if (cacheInvalidationIterator) {
-      result
-        // Ignore error, clearing cache is conservative option.
-        .catch(() => {})
-        .then(() => {
-          Object.keys(cache)
-            .filter(cacheInvalidationIterator)
-            .forEach(remove)
-        })
+      const invalidateCache = () => {
+        Object.keys(cache)
+          .filter(cacheInvalidationIterator)
+          .forEach(invalidate)
+      }
+      return promise.then(
+        (value) => {
+          invalidateCache()
+          return value
+        },
+        (error) => {
+          invalidateCache()
+          throw error
+        }
+      )
     }
 
-    return result
+    return promise
   }
 
   return createSafeSource((request) => {
-    if (isObserveRequest(request)) {
-      const key = requestCacheKey(request)
-
-      const read = () =>
-        cache.hasOwnProperty(key)
-          ? // Get directly from cache if available.
-            of(cache[key].value)
-          : // Or send read request.
-            doRequest(observeToReadRequest(request))
-
-      return merge(
-        read(),
-        expiredKeys$.pipe(filter((k) => k === key), switchMap(read))
-      )
-    } else {
+    if (!isObserveRequest(request)) {
       return doRequest(request)
     }
+
+    const key = requestCacheKey(request)
+
+    return merge(
+      of(true),
+      invalidatedKeys$.pipe(filter((k) => k === key))
+    ).pipe(switchMap(() => doRequest(observeToReadRequest(request), true)))
   })
 }

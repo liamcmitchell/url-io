@@ -1,6 +1,12 @@
 import {asyncSource} from '../asyncSource'
 
 describe('asyncSource', () => {
+  test('throws if no function provided', () => {
+    expect(() => {
+      asyncSource()
+    }).toThrow()
+  })
+
   test('returns observable from async source', (done) => {
     const source = () => 1
     const sourceLoadedAsync = asyncSource(() => Promise.resolve(source))

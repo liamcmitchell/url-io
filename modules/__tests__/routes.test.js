@@ -1,6 +1,12 @@
 import {routes} from '../routes'
 
 describe('routes', () => {
+  test('throws if object not given', () => {
+    expect(() => {
+      routes()
+    }).toThrow()
+  })
+
   test('routes request by path', () => {
     const source = routes({
       '/a': () => 'a',
