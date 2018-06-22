@@ -25,12 +25,13 @@ export class IOObservable extends Observable {
   _subscribe(subscriber) {
     this._refCount++
 
+    const externalSubscriber = new ExternalSubscriber(subscriber, this)
+    const subscription = this.getSubject().subscribe(externalSubscriber)
+
+    // After subscribing to our subject, we pass the last value if available.
     if (this._hasValue) {
       subscriber.next(this._value)
     }
-
-    const externalSubscriber = new ExternalSubscriber(subscriber, this)
-    const subscription = this.getSubject().subscribe(externalSubscriber)
 
     if (!externalSubscriber.closed && !this._connection) {
       this._connection = new Subscription()

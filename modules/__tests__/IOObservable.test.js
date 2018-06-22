@@ -81,4 +81,24 @@ describe('IOObservable', () => {
     o.disconnect()
     expect(unsubscribed).toBe(1)
   })
+
+  test('handles nested updates', () => {
+    const subject = new Rx.BehaviorSubject(1)
+    const o = new IOObservable(subject)
+    const values1 = []
+    const values2 = []
+    // We are using two subscriptions to test last value.
+    // First subscription should set last value.
+    o.subscribe((value) => {
+      values1.push(value)
+    })
+    // Second subscription should receive last value and set new value.
+    o.subscribe((value) => {
+      values2.push(value)
+      if (value === 1) subject.next(2)
+    })
+    // Both values should be the same.
+    expect(values1).toEqual([1, 2])
+    expect(values2).toEqual([1, 2])
+  })
 })
