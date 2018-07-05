@@ -18,8 +18,11 @@ export const location = (history) => {
   return routes({
     OBSERVE: () =>
       Observable.create((observer) => {
+        const subscription = history.listen((location) =>
+          observer.next(location)
+        )
         observer.next(history.location)
-        return history.listen((location) => observer.next(location))
+        return subscription
       }),
     PUSH: ({params}) => {
       history.push(params)
