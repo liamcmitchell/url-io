@@ -1,5 +1,5 @@
 import {routes} from './routes'
-import {BehaviorSubject} from 'rxjs/BehaviorSubject'
+import {BehaviorSubject} from 'rxjs'
 
 // Store value using BehaviorSubject.
 // Allow deep get and set via path.

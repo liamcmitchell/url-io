@@ -1,4 +1,4 @@
-import {_throw} from 'rxjs/observable/throw'
+import {throwError} from 'rxjs'
 import isString from 'lodash/isString'
 import {isObserveRequest} from './request'
 
@@ -14,5 +14,5 @@ export const reject = (request, error) => {
 
   error.request = request
 
-  return isObserveRequest(request) ? _throw(error) : Promise.reject(error)
+  return isObserveRequest(request) ? throwError(error) : Promise.reject(error)
 }

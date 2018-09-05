@@ -1,5 +1,5 @@
 import {isMethod, isObserveMethod, branchMethods, methods} from '../method'
-import {of} from 'rxjs/observable/of'
+import {of} from 'rxjs'
 
 describe('isMethod', () => {
   test('requires all caps string', () => {

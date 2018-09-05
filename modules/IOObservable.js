@@ -1,8 +1,5 @@
-import {Observable} from 'rxjs/Observable'
-import {Subject} from 'rxjs/Subject'
-import {Subscriber} from 'rxjs/Subscriber'
-import {Subscription} from 'rxjs/Subscription'
-import {take} from 'rxjs/operators/take'
+import {Observable, Subject, Subscriber, Subscription} from 'rxjs'
+import {take} from 'rxjs/operators'
 
 export class IOObservable extends Observable {
   constructor(source, cleanCache) {

@@ -1,5 +1,5 @@
 import {routes} from './routes'
-import {Observable} from 'rxjs/Observable'
+import {Observable} from 'rxjs'
 import pick from 'lodash/pick'
 
 const allowedOptions = ['enableHighAccuracy', 'maximumAge', 'timeout']

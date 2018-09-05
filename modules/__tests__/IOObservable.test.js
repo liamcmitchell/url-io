@@ -1,30 +1,30 @@
 import {IOObservable} from '../IOObservable'
-import Rx from 'rxjs'
+import {Observable, of, from, throwError, Subject, BehaviorSubject} from 'rxjs'
 
 describe('IOObservable', () => {
   test('passes on value', () => {
-    const o = new IOObservable(Rx.Observable.of(1))
+    const o = new IOObservable(of(1))
     const next = jest.fn()
     o.subscribe(next).unsubscribe()
     expect(next).toHaveBeenCalledWith(1)
   })
 
   test('passes on error', () => {
-    const o = new IOObservable(Rx.Observable.throw(new Error('YOLO')))
+    const o = new IOObservable(throwError(new Error('YOLO')))
     const error = jest.fn()
     o.subscribe(() => {}, error).unsubscribe()
     expect(error).toHaveBeenCalled()
   })
 
   test('does not pass on complete', () => {
-    const o = new IOObservable(Rx.Observable.of(1))
+    const o = new IOObservable(of(1))
     const complete = jest.fn()
     o.subscribe(() => {}, () => {}, complete).unsubscribe()
     expect(complete).not.toHaveBeenCalled()
   })
 
   test('does not pass on identical values (like distinctUntilChanged)', () => {
-    const o = new IOObservable(Rx.Observable.from([1, 1]))
+    const o = new IOObservable(from([1, 1]))
     const next = jest.fn()
     o.subscribe(next).unsubscribe()
     expect(next).toHaveBeenCalledTimes(1)
@@ -34,7 +34,7 @@ describe('IOObservable', () => {
     let subscribed = 0
     let unsubscribed = 0
     const o = new IOObservable(
-      Rx.Observable.create(() => {
+      Observable.create(() => {
         subscribed++
         return () => {
           unsubscribed++
@@ -49,7 +49,7 @@ describe('IOObservable', () => {
   })
 
   test('passes on latest value to subsequent subscribers (like ReplaySubject(1))', () => {
-    const subject = new Rx.Subject()
+    const subject = new Subject()
     const o = new IOObservable(subject)
     const subscription1 = o.subscribe()
     subject.next(1)
@@ -66,7 +66,7 @@ describe('IOObservable', () => {
     let unsubscribed = 0
     let cleanCache = jest.fn()
     const o = new IOObservable(
-      Rx.Observable.create(() => {
+      Observable.create(() => {
         subscribed++
         return () => {
           unsubscribed++
@@ -83,7 +83,7 @@ describe('IOObservable', () => {
   })
 
   test('handles nested updates', () => {
-    const subject = new Rx.BehaviorSubject(1)
+    const subject = new BehaviorSubject(1)
     const o = new IOObservable(subject)
     const values1 = []
     const values2 = []

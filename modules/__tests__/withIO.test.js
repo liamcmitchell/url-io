@@ -1,7 +1,7 @@
 import {createIO} from '../createIO'
 import {routes} from '../routes'
 import {withIO} from '../withIO'
-import {of} from 'rxjs/observable/of'
+import {of} from 'rxjs'
 
 describe('withIO', () => {
   const echoSource = (request) => request

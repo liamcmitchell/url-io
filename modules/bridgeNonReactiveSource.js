@@ -1,8 +1,5 @@
-import {Subject} from 'rxjs/Subject'
-import {switchMap} from 'rxjs/operators/switchMap'
-import {filter} from 'rxjs/operators/filter'
-import {of} from 'rxjs/observable/of'
-import {merge} from 'rxjs/observable/merge'
+import {Subject, of, merge} from 'rxjs'
+import {switchMap, filter} from 'rxjs/operators'
 import {createSafeSource} from './source'
 import {isObserveRequest} from './request'
 

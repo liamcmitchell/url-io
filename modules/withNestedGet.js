@@ -1,6 +1,6 @@
 import get from 'lodash/get'
 import {pathToArray} from './path'
-import {map} from 'rxjs/operators/map'
+import {map} from 'rxjs/operators'
 import {markSafeSource, createSafeSource} from './source'
 import {isObserveRequest} from './request'
 

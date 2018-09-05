@@ -1,10 +1,6 @@
 import {routes} from './routes'
-import {merge} from 'rxjs/observable/merge'
-import {of} from 'rxjs/observable/of'
-import {fromEventPattern} from 'rxjs/observable/fromEventPattern'
-import {Subject} from 'rxjs/Subject'
-import {filter} from 'rxjs/operators/filter'
-import {map} from 'rxjs/operators/map'
+import {merge, of, fromEventPattern, Subject} from 'rxjs'
+import {filter, map} from 'rxjs/operators'
 
 // Safe parse. Returning null should be safe, same result when key does not exist.
 const safeParse = (string) => {

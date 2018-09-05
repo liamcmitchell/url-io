@@ -1,5 +1,5 @@
 import {createIO} from '../createIO'
-import {Observable} from 'rxjs/Observable'
+import {Observable} from 'rxjs'
 
 describe('createIO', () => {
   test('returns function', () => {

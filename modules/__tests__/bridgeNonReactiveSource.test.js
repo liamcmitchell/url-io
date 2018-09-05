@@ -1,6 +1,5 @@
 import {bridgeNonReactiveSource} from '../bridgeNonReactiveSource'
-import {take} from 'rxjs/operators/take'
-import {bufferTime} from 'rxjs/operators/bufferTime'
+import {take, bufferTime} from 'rxjs/operators'
 
 describe('bridgeNonReactiveSource', () => {
   const source = (request) => {

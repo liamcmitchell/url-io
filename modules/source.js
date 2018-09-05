@@ -1,7 +1,7 @@
 import {isFunction} from './util'
 import {reject} from './reject'
 import {isObservable} from './util'
-import {of} from 'rxjs/observable/of'
+import {of} from 'rxjs'
 import {isObserveRequest} from './request'
 
 export const isSource = isFunction

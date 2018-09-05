@@ -1,6 +1,5 @@
 import {storage} from '../storage'
-import {take} from 'rxjs/operators/take'
-import {toArray} from 'rxjs/operators/toArray'
+import {take, toArray} from 'rxjs/operators'
 
 class MockStorage {
   constructor(values = {}) {

@@ -1,5 +1,5 @@
-import {fromPromise} from 'rxjs/observable/fromPromise'
-import {switchMap} from 'rxjs/operators/switchMap'
+import {from} from 'rxjs'
+import {switchMap} from 'rxjs/operators'
 import {isFunction} from './util'
 import {markSafeSource, createSafeSource} from './source'
 import {isObserveRequest} from './request'
@@ -30,7 +30,7 @@ export const asyncSource = (getSource) => {
     const continueRequest = () => source(request)
 
     return isObserveRequest(request)
-      ? fromPromise(sourcePromise).pipe(switchMap(continueRequest))
+      ? from(sourcePromise).pipe(switchMap(continueRequest))
       : sourcePromise.then(continueRequest)
   })
 }

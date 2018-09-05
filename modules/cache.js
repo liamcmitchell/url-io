@@ -1,8 +1,10 @@
-import {never} from 'rxjs/observable/never'
-import {finalize} from 'rxjs/operators/finalize'
-import {merge} from 'rxjs/operators/merge'
-import {publishReplay} from 'rxjs/operators/publishReplay'
-import {distinctUntilChanged} from 'rxjs/operators/distinctUntilChanged'
+import {never} from 'rxjs'
+import {
+  finalize,
+  merge,
+  publishReplay,
+  distinctUntilChanged,
+} from 'rxjs/operators'
 import {markSafeSource, createSafeSource} from './source'
 import {isObserveRequest} from './request'
 

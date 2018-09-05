@@ -6,7 +6,7 @@ import {
   createSafeSource,
   tryCatch,
 } from '../source'
-import {of} from 'rxjs/observable/of'
+import {of} from 'rxjs'
 
 describe('isSource', () => {
   test('returns true for a function', () => {
