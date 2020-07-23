@@ -1,7 +1,7 @@
-import {isFunction} from './util'
+import {isFunction, isPromise} from './util'
 import {reject} from './reject'
 import {isObservable} from './util'
-import {of} from 'rxjs'
+import {of, from} from 'rxjs'
 import {isObserveRequest} from './request'
 
 export const isSource = isFunction
@@ -36,6 +36,8 @@ export const createSafeSource = (source, name) => {
           )
 
         if (isObservable(result)) return result
+
+        if (isPromise(result)) return from(result)
 
         return of(result)
       } else {

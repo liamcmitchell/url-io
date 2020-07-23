@@ -86,6 +86,18 @@ describe('createSafeSource', () => {
     expect(source({method: 'OTHER'})).toBe(truePromise)
   })
 
+  test('safeSource returns resolved promise value when consumed as an observable', async () => {
+    const source = createSafeSource(() => Promise.resolve(true))
+    let value
+    source({method: 'OBSERVE'}).subscribe((v) => {
+      value = v
+    })
+
+    await 1
+
+    expect(value).toBe(true)
+  })
+
   test('safeSource returns promise when source returns other than promise', () => {
     const source = createSafeSource(() => true)
     expect(source({method: 'OTHER'})).resolves.toBe(true)

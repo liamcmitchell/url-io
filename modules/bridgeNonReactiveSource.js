@@ -64,7 +64,7 @@ export const bridgeNonReactiveSource = ({
     }
 
     if (canCache) {
-      if (!cache.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(cache, key)) {
         // Create cache object.
         const cacheEntry = (cache[key] = {})
 
@@ -103,9 +103,7 @@ export const bridgeNonReactiveSource = ({
     // Invalidate cache if required.
     if (cacheInvalidationIterator) {
       const invalidateCache = () => {
-        Object.keys(cache)
-          .filter(cacheInvalidationIterator)
-          .forEach(invalidate)
+        Object.keys(cache).filter(cacheInvalidationIterator).forEach(invalidate)
       }
       return promise.then(
         (value) => {

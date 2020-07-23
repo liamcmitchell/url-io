@@ -19,7 +19,11 @@ describe('IOObservable', () => {
   test('does not pass on complete', () => {
     const o = new IOObservable(of(1))
     const complete = jest.fn()
-    o.subscribe(() => {}, () => {}, complete).unsubscribe()
+    o.subscribe(
+      () => {},
+      () => {},
+      complete
+    ).unsubscribe()
     expect(complete).not.toHaveBeenCalled()
   })
 

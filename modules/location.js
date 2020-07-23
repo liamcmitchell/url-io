@@ -8,10 +8,10 @@ export const location = (history) => {
     !history.listen ||
     !history.push ||
     !history.replace ||
-    !history.goBack
+    !(history.goBack || history.back)
   ) {
     throw new Error(
-      'history 4.x required: https://www.npmjs.com/package/history'
+      'history v4/5 required: https://www.npmjs.com/package/history'
     )
   }
 
@@ -19,7 +19,9 @@ export const location = (history) => {
     OBSERVE: () =>
       Observable.create((observer) => {
         const subscription = history.listen((location) =>
-          observer.next(location)
+          // v4: Location is first arg.
+          // v5: Location is nested in first arg.
+          observer.next(location.location || location)
         )
         observer.next(history.location)
         return subscription
@@ -31,7 +33,10 @@ export const location = (history) => {
       history.replace(params)
     },
     GO_BACK: () => {
-      history.goBack()
+      // v4
+      if (history.goBack) history.goBack()
+      // v5
+      else history.back()
     },
   })
 }

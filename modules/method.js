@@ -35,7 +35,7 @@ export const branchMethods = (methods) => (source) => {
   return markSafeSource((request) => {
     const {method} = request
 
-    const methodSource = sources.hasOwnProperty(method)
+    const methodSource = Object.prototype.hasOwnProperty.call(sources, method)
       ? sources[method]
       : source
 
@@ -46,7 +46,7 @@ export const branchMethods = (methods) => (source) => {
 export const methods = (methods) => {
   let defaultSource
 
-  if (methods.hasOwnProperty('default')) {
+  if (Object.prototype.hasOwnProperty.call(methods, 'default')) {
     defaultSource = methods.default
     methods = Object.assign({}, methods)
     delete methods.default

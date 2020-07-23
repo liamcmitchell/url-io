@@ -34,17 +34,17 @@ io('/user', 'SIGN_IN', {id, password}).then(() => {})
 
 [React bindings](https://github.com/liamcmitchell/react-io)
 
-## TOC
-
-* [`io()`](#io)
-* [`createIO()`](#createio)
-* [Source](#source)
-* [Request](#request)
-* Sources
-  * [`paths()`](#paths)
-  * [`methods()`](#methods)
-  * [`routes()`](#routes)
-  * [`rejectNotFound`](#rejectnotfound)
+- [url-io](#url-io)
+  - [`io()`](#io)
+  - [`createIO()`](#createio)
+  - [Source](#source)
+  - [Request](#request)
+  - [Higher-order sources](#higher-order-sources)
+  - [Sources](#sources)
+    - [`methods()`](#methods)
+    - [`paths()`](#paths)
+    - [`routes()`](#routes)
+    - [`rejectNotFound`](#rejectnotfound)
 
 ## `io()`
 

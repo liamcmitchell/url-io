@@ -7,7 +7,9 @@ class MockStorage {
   }
 
   getItem(key) {
-    return this.values.hasOwnProperty(key) ? this.values[key] : null
+    return Object.prototype.hasOwnProperty.call(this.values, key)
+      ? this.values[key]
+      : null
   }
 
   setItem(key, value) {
@@ -24,9 +26,7 @@ describe('storage', () => {
     const source = storage(new MockStorage({key: 'true'}))
 
     return expect(
-      source({method: 'OBSERVE', path: 'key'})
-        .pipe(take(1))
-        .toPromise()
+      source({method: 'OBSERVE', path: 'key'}).pipe(take(1)).toPromise()
     ).resolves.toBe(true)
   })
 
@@ -34,9 +34,7 @@ describe('storage', () => {
     const source = storage(new MockStorage({key: '!!!!'}))
 
     return expect(
-      source({method: 'OBSERVE', path: 'key'})
-        .pipe(take(1))
-        .toPromise()
+      source({method: 'OBSERVE', path: 'key'}).pipe(take(1)).toPromise()
     ).resolves.toBe(null)
   })
 

@@ -43,9 +43,9 @@ describe('withIO', () => {
   })
 
   test('resolves nested dynamic io request for OTHER', () => {
-    return expect(io('/dynamic', 'OTHER', {path: '/a'})).resolves.toMatchObject(
-      {a: 'a'}
-    )
+    return expect(
+      io('/dynamic', 'OTHER', {path: '/a'})
+    ).resolves.toMatchObject({a: 'a'})
   })
 
   test('resolves nested observable for OTHER', () => {

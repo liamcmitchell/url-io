@@ -42,7 +42,7 @@ export const toRequest = (requestOrPath, methodOrParams, params) => {
   // Remove starting slash (only required at root).
   request.path = request.path.slice(1)
 
-  if (!request.hasOwnProperty('method')) {
+  if (!Object.prototype.hasOwnProperty.call(request, 'method')) {
     request.method = isString(methodOrParams) ? methodOrParams : 'OBSERVE'
   }
 
@@ -50,10 +50,12 @@ export const toRequest = (requestOrPath, methodOrParams, params) => {
     throw new Error("io requires a string method e.g. io('/path', 'OBSERVE')")
   }
 
-  if (!request.hasOwnProperty('params')) {
+  if (!Object.prototype.hasOwnProperty.call(request, 'params')) {
     request.params = isObjectLike(methodOrParams)
       ? methodOrParams
-      : isObjectLike(params) ? params : {}
+      : isObjectLike(params)
+      ? params
+      : {}
   }
 
   if (!isObjectLike(request.params)) {

@@ -79,7 +79,7 @@ export const branchPaths = (paths) => (source) => {
     const {path} = request
     const thisPath = currentPath(path)
 
-    if (sources.hasOwnProperty(thisPath)) {
+    if (Object.prototype.hasOwnProperty.call(sources, thisPath)) {
       const source = sources[thisPath]
       return source(
         Object.assign({}, request, {

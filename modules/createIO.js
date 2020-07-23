@@ -36,7 +36,7 @@ export const createIO = (source) => {
     const key = cacheKey(request)
 
     // If there is nothing in the cache, add it.
-    if (!cache.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(cache, key)) {
       cache[key] = new IOObservable(source(request), cleanCache)
       // And call clean just in case it is requested but never used.
       cleanCache()

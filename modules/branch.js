@@ -8,9 +8,8 @@ export const branch = (predicate, trueSource) => {
     trueSource = createSafeSource(trueSource)
     falseSource = createSafeSource(falseSource)
 
-    return markSafeSource(
-      (request) =>
-        predicate(request) ? trueSource(request) : falseSource(request)
+    return markSafeSource((request) =>
+      predicate(request) ? trueSource(request) : falseSource(request)
     )
   }
 }

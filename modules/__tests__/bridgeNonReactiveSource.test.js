@@ -90,9 +90,7 @@ describe('bridgeNonReactiveSource', () => {
 
     const next = jest.fn()
 
-    wrappedSource({method: 'OBSERVE', path: ''})
-      .subscribe(next)
-      .unsubscribe()
+    wrappedSource({method: 'OBSERVE', path: ''}).subscribe(next).unsubscribe()
 
     expect(next).toHaveBeenCalledTimes(1)
   })

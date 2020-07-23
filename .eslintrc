@@ -2,7 +2,7 @@
   "extends": ["eslint:recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module",
+    "sourceType": "module"
   },
   "env": {
     "es6": true,
@@ -10,9 +10,8 @@
     "jest": true
   },
   "rules": {
-    "no-console": ["warn", { "allow": ["warn", "error"]}]
+    "no-console": ["warn", {"allow": ["warn", "error"]}]
   },
-  "plugins": [
-    "jest"
-  ]
+  "plugins": ["jest"],
+  "ignorePatterns": ["dist/**"]
 }
