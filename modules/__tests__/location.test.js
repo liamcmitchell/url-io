@@ -5,14 +5,29 @@ import {createMemoryHistory} from 'history'
 // Mock v4 API.
 const createV4MemoryHistory = () => {
   const history = createMemoryHistory()
+
+  // back was named goBack
   history.goBack = history.back
   history.back = null
+
+  // action was passed as a second arg
   const listen = history.listen
   history.listen = (cb) => {
     return listen.call(history, ({location, action}) => {
       cb(location, action)
     })
   }
+
+  // push and replace accepted state in location object
+  const push = history.push
+  history.push = ({state, ...location}) => {
+    return push.call(history, location, state)
+  }
+  const replace = history.replace
+  history.replace = ({state, ...location}) => {
+    return replace.call(history, location, state)
+  }
+
   return history
 }
 
@@ -26,29 +41,51 @@ for (const [version, createHistory] of historyVersions) {
     test('observe', async () => {
       const io = createIO(location(createHistory()))
 
-      await expect(io('/')).resolves.toEqual(
-        expect.objectContaining({pathname: '/'})
-      )
+      await expect(io('/')).resolves.toEqual({
+        pathname: '/',
+        search: '',
+        hash: '',
+        state: undefined,
+        key: expect.any(String),
+      })
     })
 
     test('push', async () => {
       const io = createIO(location(createHistory()))
 
-      await io('/', 'PUSH', {pathname: '/new'})
+      await io('/', 'PUSH', {
+        pathname: '/new',
+        search: '?s',
+        hash: '#h',
+        state: {a: 1},
+      })
 
-      await expect(io('/')).resolves.toEqual(
-        expect.objectContaining({pathname: '/new'})
-      )
+      await expect(io('/')).resolves.toEqual({
+        pathname: '/new',
+        search: '?s',
+        hash: '#h',
+        state: {a: 1},
+        key: expect.any(String),
+      })
     })
 
     test('replace', async () => {
       const io = createIO(location(createHistory()))
 
-      await io('/', 'REPLACE', {pathname: '/new'})
+      await io('/', 'REPLACE', {
+        pathname: '/new',
+        search: '?s',
+        hash: '#h',
+        state: {a: 1},
+      })
 
-      await expect(io('/')).resolves.toEqual(
-        expect.objectContaining({pathname: '/new'})
-      )
+      await expect(io('/')).resolves.toEqual({
+        pathname: '/new',
+        search: '?s',
+        hash: '#h',
+        state: {a: 1},
+        key: expect.any(String),
+      })
     })
 
     test('go back', async () => {
@@ -57,9 +94,13 @@ for (const [version, createHistory] of historyVersions) {
       await io('/', 'PUSH', {pathname: '/new'})
       await io('/', 'GO_BACK')
 
-      await expect(io('/')).resolves.toEqual(
-        expect.objectContaining({pathname: '/'})
-      )
+      await expect(io('/')).resolves.toEqual({
+        pathname: '/',
+        search: '',
+        hash: '',
+        state: undefined,
+        key: expect.any(String),
+      })
     })
 
     test('nested push', async () => {
