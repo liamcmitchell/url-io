@@ -26,6 +26,7 @@ const v5Location = ({pathname, search, hash}) => ({
 const v5State = ({state}) => state
 
 export const location = (history) => {
+  // istanbul ignore next
   if (
     process.env.NODE_ENV !== 'production' &&
     (!history ||

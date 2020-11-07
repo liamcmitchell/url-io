@@ -62,10 +62,19 @@ export class IOObservable extends Observable {
     else this.disconnect()
   }
 
+  // When used as a promise, we only want the first value.
+  toPromise() {
+    return this.pipe(take(1)).toPromise()
+  }
+
   // Allow use as promise.
-  then() {
-    const promise = this.pipe(take(1)).toPromise()
-    return promise.then.apply(promise, arguments)
+  then(onFulfilled, onRejected) {
+    return this.toPromise().then(onFulfilled, onRejected)
+  }
+
+  // Allow use as promise.
+  catch(onRejected) {
+    return this.toPromise().catch(onRejected)
   }
 }
 
@@ -116,8 +125,6 @@ class ExternalSubscriber extends Subscriber {
 
   _unsubscribe() {
     const {observable} = this
-
-    if (!observable) return
 
     this.observable = null
 

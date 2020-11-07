@@ -40,7 +40,9 @@ export const storage = (Storage) => {
         ).pipe(map(safeParse))
       },
       SET: ({key, params: {value}}) => {
-        value = JSON.stringify(value === undefined ? null : value)
+        // Undefined can not be stringified, save as empty string instead.
+        // This will be read back as null in safeParse.
+        value = value === undefined ? '' : JSON.stringify(value)
 
         Storage.setItem(key, value)
         localUpdates$.next({key, newValue: value})

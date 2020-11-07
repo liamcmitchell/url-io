@@ -2,18 +2,20 @@ import {IOObservable} from '../IOObservable'
 import {Observable, of, from, throwError, Subject, BehaviorSubject} from 'rxjs'
 
 describe('IOObservable', () => {
-  test('passes on value', () => {
+  test('passes on value', async () => {
     const o = new IOObservable(of(1))
     const next = jest.fn()
     o.subscribe(next).unsubscribe()
     expect(next).toHaveBeenCalledWith(1)
+    await expect(o).resolves.toBe(1)
   })
 
-  test('passes on error', () => {
+  test('passes on error', async () => {
     const o = new IOObservable(throwError(new Error('YOLO')))
     const error = jest.fn()
     o.subscribe(() => {}, error).unsubscribe()
     expect(error).toHaveBeenCalled()
+    await expect(o).rejects.toThrow('YOLO')
   })
 
   test('does not pass on complete', () => {
@@ -104,5 +106,24 @@ describe('IOObservable', () => {
     // Both values should be the same.
     expect(values1).toEqual([1, 2])
     expect(values2).toEqual([1, 2])
+  })
+
+  test('can be consumed with Promise.then', async () => {
+    const o = new IOObservable(of(1))
+    await expect(o.then((v) => v)).resolves.toBe(1)
+  })
+
+  test('errors can handled with Promise.then', async () => {
+    const o = new IOObservable(throwError(new Error('YOLO')))
+    const handler = jest.fn(() => 1)
+    await expect(o.then(() => {}, handler)).resolves.toBe(1)
+    expect(handler).toHaveBeenCalledWith(expect.any(Error))
+  })
+
+  test('errors can handled with Promise.catch', async () => {
+    const o = new IOObservable(throwError(new Error('YOLO')))
+    const handler = jest.fn(() => 1)
+    await expect(o.catch(handler)).resolves.toBe(1)
+    expect(handler).toHaveBeenCalledWith(expect.any(Error))
   })
 })

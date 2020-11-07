@@ -22,14 +22,15 @@ describe('io', () => {
     return request
   })
 
-  test('returns observable (with promise method) for OBSERVE requests', () => {
+  test('returns observable (with promise methods) for OBSERVE requests', () => {
     const result = io('/')
     expect(result.subscribe).toBeInstanceOf(Function)
     expect(result.then).toBeInstanceOf(Function)
+    expect(result.catch).toBeInstanceOf(Function)
   })
 
   test('returns promise for non-OBSERVE requests', () => {
-    expect(io('/', 'OTHER').then).toBeInstanceOf(Function)
+    expect(io('/', 'OTHER')).toBeInstanceOf(Promise)
   })
 
   test('sets default request values', () => {

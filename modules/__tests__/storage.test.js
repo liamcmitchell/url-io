@@ -38,6 +38,13 @@ describe('storage', () => {
     ).resolves.toBe(null)
   })
 
+  test('writes undefined as empty string', () => {
+    const mockStorage = new MockStorage({})
+    const source = storage(mockStorage)
+    source({method: 'SET', path: 'key', params: {}})
+    return expect(mockStorage.values.key).toBe('')
+  })
+
   test('updates storage value', () => {
     const Storage = new MockStorage()
     const source = storage(Storage)
