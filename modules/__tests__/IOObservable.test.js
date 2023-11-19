@@ -40,7 +40,7 @@ describe('IOObservable', () => {
     let subscribed = 0
     let unsubscribed = 0
     const o = new IOObservable(
-      Observable.create(() => {
+      new Observable(() => {
         subscribed++
         return () => {
           unsubscribed++
