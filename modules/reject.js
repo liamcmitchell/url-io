@@ -1,6 +1,6 @@
 import {throwError} from 'rxjs'
-import isString from 'lodash/isString'
 import {isObserveRequest} from './request'
+import {isString} from './util'
 
 export const reject = (request, error) => {
   if (!error) {

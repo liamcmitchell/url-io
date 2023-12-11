@@ -1,5 +1,4 @@
-import isString from 'lodash/isString'
-import isObjectLike from 'lodash/isObjectLike'
+import {isObject, isString} from './util'
 
 export const reservedRequestKeys = [
   'io',
@@ -22,9 +21,13 @@ export const isObserveRequest = (request) => request.method === 'OBSERVE'
 export const cacheKey = ({path, params}) => path + JSON.stringify(params)
 
 export const toRequest = (requestOrPath, methodOrParams, params) => {
-  const request = isObjectLike(requestOrPath)
-    ? Object.assign({}, requestOrPath)
-    : {path: requestOrPath}
+  const request = isString(requestOrPath)
+    ? {
+        path: requestOrPath,
+        method: isString(methodOrParams) ? methodOrParams : undefined,
+        params: isString(methodOrParams) ? params : methodOrParams,
+      }
+    : {...requestOrPath}
 
   if (!isString(request.path)) {
     throw new Error("io requires a string path e.g. io('/path')")
@@ -42,23 +45,15 @@ export const toRequest = (requestOrPath, methodOrParams, params) => {
   // Remove starting slash (only required at root).
   request.path = request.path.slice(1)
 
-  if (!Object.prototype.hasOwnProperty.call(request, 'method')) {
-    request.method = isString(methodOrParams) ? methodOrParams : 'OBSERVE'
-  }
+  request.method ??= 'OBSERVE'
 
   if (!isString(request.method)) {
     throw new Error("io requires a string method e.g. io('/path', 'OBSERVE')")
   }
 
-  if (!Object.prototype.hasOwnProperty.call(request, 'params')) {
-    request.params = isObjectLike(methodOrParams)
-      ? methodOrParams
-      : isObjectLike(params)
-      ? params
-      : {}
-  }
+  request.params ??= {}
 
-  if (!isObjectLike(request.params)) {
+  if (!isObject(request.params)) {
     throw new Error(
       "io requires an object of params e.g. io('/path', 'OBSERVE', {count: 1})"
     )

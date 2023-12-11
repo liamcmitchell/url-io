@@ -1,25 +1,12 @@
-import {toRequest, isObserveRequest, cacheKey} from './request'
+import {toRequest, isObserveRequest} from './request'
 import {IOObservable} from './IOObservable'
 import {createSafeSource} from './source'
-import debounce from 'lodash/debounce'
 
 // Return consumer friendly API.
 export const createIO = (source) => {
   source = createSafeSource(source)
 
   const cache = {}
-
-  // istanbul ignore next
-  const cleanCache = debounce(() => {
-    Object.keys(cache).forEach((key) => {
-      const observable = cache[key]
-      if (observable._refCount <= 0) {
-        delete cache[key]
-        delete observable.cleanCache
-        observable.disconnect()
-      }
-    })
-  })
 
   // Accept request object like sources or [path, method, params] which
   // should be easier for consumers to work with.
@@ -33,15 +20,6 @@ export const createIO = (source) => {
       return source(request)
     }
 
-    const key = cacheKey(request)
-
-    // If there is nothing in the cache, add it.
-    if (!Object.prototype.hasOwnProperty.call(cache, key)) {
-      cache[key] = new IOObservable(source(request), cleanCache)
-      // And call clean just in case it is requested but never used.
-      cleanCache()
-    }
-
-    return cache[key]
+    return new IOObservable(source, request, cache)
   }
 }

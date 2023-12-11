@@ -1,8 +1,4 @@
-import isObjectLike from 'lodash/isObjectLike'
-import {isFunction, isObservable} from './util'
-import values from 'lodash/values'
-import mapValues from 'lodash/mapValues'
-import zipObject from 'lodash/zipObject'
+import {isFunction, isObject, isObservable} from './util'
 import {combineLatest} from 'rxjs'
 import {switchMap, take} from 'rxjs/operators'
 import {createSafeSource} from './source'
@@ -16,12 +12,14 @@ export const withIO = (urls) => (source) => {
 
     const urlsMap = isFunction(urls) ? urls(request) : urls
 
-    if (!isObjectLike(urlsMap)) {
+    if (!isObject(urlsMap)) {
       throw new Error('withIO requires a map of io objects/requests')
     }
 
+    const keys = Object.keys(urlsMap)
+
     // Turn urls into observables if they aren't already.
-    const ioRequests = mapValues(urlsMap, (url) => {
+    const ioRequests = Object.values(urlsMap).map((url) => {
       const observable = isObservable(url) ? url : io(url)
 
       return isObserveRequest(request)
@@ -30,19 +28,14 @@ export const withIO = (urls) => (source) => {
     })
 
     const continueRequestWithValues = (values) =>
-      source(
-        Object.assign(
-          {},
-          request,
-          // Resolved values overwrite request values.
-          zipObject(Object.keys(ioRequests), values)
-        )
-      )
+      source({
+        ...request,
+        // Resolved values overwrite request values.
+        ...Object.fromEntries(keys.map((key, i) => [key, values[i]])),
+      })
 
     return isObserveRequest(request)
-      ? combineLatest(values(ioRequests)).pipe(
-          switchMap(continueRequestWithValues)
-        )
-      : Promise.all(values(ioRequests)).then(continueRequestWithValues)
+      ? combineLatest(ioRequests).pipe(switchMap(continueRequestWithValues))
+      : Promise.all(ioRequests).then(continueRequestWithValues)
   })
 }

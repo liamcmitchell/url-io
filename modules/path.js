@@ -1,7 +1,7 @@
 import {rejectNotFound} from './rejectNotFound'
 import {ensureRequestKey} from './request'
-import isString from 'lodash/isString'
 import {markSafeSource, createSafeSource} from './source'
+import {isString} from './util'
 
 // Require / prefix to make it easier to understand that these are routes.
 export const isPath = (path) =>

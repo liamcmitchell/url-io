@@ -1,4 +1,3 @@
-import get from 'lodash/get'
 import {pathToArray} from './path'
 import {map} from 'rxjs/operators'
 import {markSafeSource, createSafeSource} from './source'
@@ -6,8 +5,6 @@ import {isObserveRequest} from './request'
 
 // Given an existing path & value: /value -> {a: 1}
 // Allow accessing nested values: /value/a -> 1
-// This will return undefined for any non-existing path.
-// https://lodash.com/docs/4.17.4#get
 export const withNestedGet = () => (source) => {
   source = createSafeSource(source)
 
@@ -18,14 +15,13 @@ export const withNestedGet = () => (source) => {
       const pathArray = pathToArray(path)
 
       if (pathArray.length) {
-        return source(
-          Object.assign({}, request, {
-            // Ask for the root.
-            path: '',
-          })
-        ).pipe(
+        return source({
+          ...request,
+          // Ask for the root.
+          path: '',
+        }).pipe(
           // And map to get nested val.
-          map((v) => get(v, pathArray))
+          map((v) => pathArray.reduce((prev, current) => prev?.[current], v))
         )
       }
     }

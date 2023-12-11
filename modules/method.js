@@ -1,6 +1,5 @@
-import {isObservable} from './util'
+import {isObservable, isString} from './util'
 import {rejectNotFound} from './rejectNotFound'
-import isString from 'lodash/isString'
 import {markSafeSource, createSafeSource} from './source'
 
 export const isMethod = (method) => isString(method) && /^[A-Z_]+$/.test(method)

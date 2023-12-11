@@ -42,9 +42,7 @@
     "url": "https://github.com/liamcmitchell/url-io/issues"
   },
   "homepage": "https://github.com/liamcmitchell/url-io#readme",
-  "dependencies": {
-    "lodash": "^4.17.19"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "rxjs": "^6.0.0 || ^7.0.0"
   },
@@ -67,8 +65,7 @@
     "rimraf": "^5.0.5",
     "rollup": "^4.4.1",
     "rxjs": "^7.0.0",
-    "typescript": "^5.2.2",
-    "vitest": "^0.34.6"
+    "typescript": "^5.2.2"
   },
   "husky": {
     "hooks": {
