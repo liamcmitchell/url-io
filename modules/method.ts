@@ -1,22 +1,27 @@
 import {isObservable, isString} from './util'
 import {rejectNotFound} from './rejectNotFound'
-import {markSafeSource, createSafeSource} from './source'
+import {markSafeSource, createSafeSource, Source} from './source'
+import {Observable} from 'rxjs'
 
-export const isMethod = (method) => isString(method) && /^[A-Z_]+$/.test(method)
+export const isMethod = (method: unknown) =>
+  isString(method) && /^[A-Z_]+$/.test(method)
 
-export const isObserveMethod = (method) => method === 'OBSERVE'
+export const isObserveMethod = (method: unknown) => method === 'OBSERVE'
 
-const ensureMethod = (method) => {
+const ensureMethod = (method: unknown) => {
   if (!isMethod(method))
     throw new Error('Method must be upper case with underscores')
 }
 
-const createObservableSource = (observable) => () => observable
+const createObservableSource = (observable: Observable<unknown>) => () =>
+  observable
 
-export const branchMethods = (methods) => (source) => {
+type Methods = Record<string, Source>
+
+export const branchMethods = (methods: Methods) => (source: Source) => {
   source = createSafeSource(source)
 
-  const sources = {}
+  const sources: Methods = {}
 
   for (const method in methods) {
     ensureMethod(method)
@@ -42,7 +47,7 @@ export const branchMethods = (methods) => (source) => {
   })
 }
 
-export const methods = (methods) => {
+export const methods = (methods: Methods) => {
   let defaultSource
 
   if (Object.prototype.hasOwnProperty.call(methods, 'default')) {

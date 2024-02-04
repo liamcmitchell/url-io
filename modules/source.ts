@@ -1,25 +1,32 @@
 import {isFunction, isPromise} from './util'
 import {reject} from './reject'
 import {isObservable} from './util'
-import {of, from} from 'rxjs'
-import {isObserveRequest} from './request'
+import {of, from, Observable} from 'rxjs'
+import {Request, isObserveRequest} from './request'
 
 export const isSource = isFunction
 
-export const ensureSource = (source, name) => {
+export type Source = ((request: Request) => unknown) & {safe?: boolean}
+
+export type SafeSource = ((
+  request: Request
+) => Promise<unknown> | Observable<unknown>) & {safe?: boolean}
+
+export const ensureSource = (source: Source, name?: string) => {
   if (!isSource(source)) {
     throw new Error(`Source must be a function ${name ? `(${name})` : ''}`)
   }
 }
 
-export const markSafeSource = (source) => {
+export const markSafeSource = (source: Source) => {
   source.safe = true
-  return source
+  return source as SafeSource
 }
 
-export const isSafeSource = (source) => isSource(source) && source.safe === true
+export const isSafeSource = (source: Source): source is SafeSource =>
+  isSource(source) && source.safe === true
 
-export const createSafeSource = (source, name) => {
+export const createSafeSource = (source: Source, name?: string) => {
   ensureSource(source, name)
 
   if (isSafeSource(source)) return source
@@ -32,7 +39,7 @@ export const createSafeSource = (source, name) => {
       if (isObserveRequest(request)) {
         if (result === undefined)
           throw new Error(
-            `Source for ${method} ${originalPath} didn't return anything. If you really want to return undefined, wrap it as an observable.`
+            `Source for ${method} ${originalPath} returned undefined. If you want to emit undefined, wrap it in an observable.`
           )
 
         if (isObservable(result)) return result
@@ -49,5 +56,5 @@ export const createSafeSource = (source, name) => {
   })
 }
 
-// Deprecated.
+/** @deprecated */
 export const tryCatch = () => createSafeSource

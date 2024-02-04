@@ -4,7 +4,7 @@ Read and mutate data using a standard interface.
 
 ```javascript
 import {createIO, routes} from 'url-io'
-import {BehaviorSubject} from 'rxjs/BehaviorSubject'
+import {BehaviorSubject} from 'rxjs'
 
 const user$ = new BehaviorSubject({})
 
@@ -124,7 +124,7 @@ methods(methods: Object): Source
 
 ```javascript
 import {methods} from 'url-io'
-import {BehaviorSubject} from 'rxjs/BehaviorSubject'
+import {BehaviorSubject} from 'rxjs'
 
 const val = new BehaviorSubject(1)
 

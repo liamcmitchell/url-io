@@ -1,50 +1,54 @@
 import {rejectNotFound} from './rejectNotFound'
 import {ensureRequestKey} from './request'
-import {markSafeSource, createSafeSource} from './source'
+import {markSafeSource, createSafeSource, Source} from './source'
 import {isString} from './util'
 
 // Require / prefix to make it easier to understand that these are routes.
-export const isPath = (path) =>
+export const isPath = (path: string) =>
   isString(path) && path[0] === '/' && path.indexOf('/', 1) === -1
 
-const ensurePath = (path) => {
+const ensurePath = (path: string) => {
   if (!isPath(path))
     throw new Error(
       `Path must start with and contain only one slash "/" (${path})`
     )
 }
 
-const pathPiece = (path) => path.slice(1)
+const pathPiece = (path: string) => path.slice(1)
 
-export const currentPath = (path) => {
+export const currentPath = (path: string) => {
   const index = path.indexOf('/')
   return index === -1 ? path : path.slice(0, index)
 }
 
-export const nextPath = (path) => {
+export const nextPath = (path: string) => {
   const index = path.indexOf('/')
   return index === -1 ? '' : path.slice(index + 1)
 }
 
 // Deprecated.
-export const currentNextPath = (path) => [currentPath(path), nextPath(path)]
+export const currentNextPath = (path: string) => [
+  currentPath(path),
+  nextPath(path),
+]
 
-export const isTokenPath = (path) => isPath(path) && path[1] === ':'
+export const isTokenPath = (path: string) => isPath(path) && path[1] === ':'
 
-const ensureTokenPath = (path) => {
+const ensureTokenPath = (path: string) => {
   ensurePath(path)
   if (!isTokenPath(path))
     throw new Error(`Token path must start with "/:" (${path})`)
 }
 
-const tokenPathKey = (path) => path.slice(2)
+const tokenPathKey = (path: string) => path.slice(2)
 
-export const pathToArray = (path) =>
+export const pathToArray = (path: string) =>
   Array.isArray(path) ? path : path.split('/').filter(Boolean)
 
-export const pathToString = (path) => (isString(path) ? path : path.join('/'))
+export const pathToString = (path: string | string[]) =>
+  isString(path) ? path : path.join('/')
 
-export const withPathToken = (path) => (source) => {
+export const withPathToken = (path: string) => (source: Source) => {
   source = createSafeSource(source)
 
   ensureTokenPath(path)
@@ -65,40 +69,41 @@ export const withPathToken = (path) => (source) => {
   })
 }
 
-export const branchPaths = (paths) => (source) => {
-  source = createSafeSource(source)
+export const branchPaths =
+  (paths: Record<string, Source>) => (source: Source) => {
+    source = createSafeSource(source)
 
-  const sources = {}
+    const sources: Record<string, Source> = {}
 
-  for (const path in paths) {
-    ensurePath(path)
-    sources[pathPiece(path)] = createSafeSource(paths[path], path)
-  }
-
-  return markSafeSource((request) => {
-    const {path} = request
-    const thisPath = currentPath(path)
-
-    if (Object.prototype.hasOwnProperty.call(sources, thisPath)) {
-      const source = sources[thisPath]
-      return source(
-        Object.assign({}, request, {
-          path: nextPath(path),
-        })
-      )
+    for (const path in paths) {
+      ensurePath(path)
+      sources[pathPiece(path)] = createSafeSource(paths[path], path)
     }
 
-    return source(request)
-  })
-}
+    return markSafeSource((request) => {
+      const {path} = request
+      const thisPath = currentPath(path)
+
+      if (Object.prototype.hasOwnProperty.call(sources, thisPath)) {
+        const source = sources[thisPath]
+        return source(
+          Object.assign({}, request, {
+            path: nextPath(path),
+          })
+        )
+      }
+
+      return source(request)
+    })
+  }
 
 // Return source that branches requests based on url.
 // Supports one token path (e.g. '/:id'), all others are
 // matched exactly.
 // Token is added to the request using the given key.
-export const paths = (paths) => {
+export const paths = (paths: Record<string, Source>) => {
   let tokenSource
-  const staticPaths = {}
+  const staticPaths: Record<string, Source> = {}
 
   for (const path in paths) {
     if (isTokenPath(path)) {

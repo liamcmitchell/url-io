@@ -7,18 +7,28 @@ describe('cache', () => {
   })
 
   test('returns same observable for identical OBSERVE requests', () => {
-    const source = cache()(() => 1)
-    expect(source({method: 'OBSERVE', path: ''})).toBe(
-      source({method: 'OBSERVE', path: ''})
-    )
+    let subscriptions = 0
+    const source = cache()(() => ++subscriptions)
+    let value1
+    source({method: 'OBSERVE', path: ''}).subscribe((v) => {
+      value1 = v
+    })
+    expect(value1).toBe(1)
+    let value2
+    source({method: 'OBSERVE', path: ''}).subscribe((v) => {
+      value2 = v
+    })
+    expect(value2).toBe(1)
+    expect(subscriptions).toBe(1)
   })
 
   test('removes self from cache on finalize', () => {
-    const source = cache()(() => 1)
-    const o1 = source({method: 'OBSERVE', path: ''})
+    let subscriptions = 0
+    const source = cache()(() => ++subscriptions)
 
-    expect(source({method: 'OBSERVE', path: ''})).toBe(o1)
-    o1.subscribe().unsubscribe()
-    expect(source({method: 'OBSERVE', path: ''})).not.toBe(o1)
+    source({method: 'OBSERVE', path: ''}).subscribe().unsubscribe()
+    source({method: 'OBSERVE', path: ''}).subscribe().unsubscribe()
+
+    expect(subscriptions).toBe(2)
   })
 })

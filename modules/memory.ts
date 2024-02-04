@@ -3,7 +3,7 @@ import {BehaviorSubject} from 'rxjs'
 
 // Store value using BehaviorSubject.
 // Allow deep get and set via path.
-export const memory = (initialValue) => {
+export const memory = (initialValue: unknown) => {
   const subject$ = new BehaviorSubject(initialValue)
 
   return routes({

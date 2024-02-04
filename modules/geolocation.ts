@@ -12,14 +12,14 @@ export const geolocation = routes({
         return
       }
 
-      const success = (position) => observer.next({position})
-      const error = (error) => observer.next({error})
+      const success: PositionCallback = (position) => observer.next({position})
+      const error: PositionErrorCallback = (error) => observer.next({error})
 
       const watchId = navigator.geolocation.watchPosition(success, error, {
         enableHighAccuracy,
         maximumAge,
         timeout,
-      })
+      } as PositionOptions)
 
       return () => {
         navigator.geolocation.clearWatch(watchId)

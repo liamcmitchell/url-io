@@ -1,3 +1,4 @@
+import {IO} from './createIO'
 import {isObject, isString} from './util'
 
 export const reservedRequestKeys = [
@@ -8,7 +9,7 @@ export const reservedRequestKeys = [
   'params',
 ]
 
-export const ensureRequestKey = (key) => {
+export const ensureRequestKey = (key: string) => {
   if (!isString(key) || !/^[a-z]/.test(key))
     throw new Error(`Request key must be a string matching /^[a-z]/ (${key})`)
 
@@ -16,17 +17,33 @@ export const ensureRequestKey = (key) => {
     throw new Error(`Request key is reserved (${key})`)
 }
 
-export const isObserveRequest = (request) => request.method === 'OBSERVE'
+export type Params = Record<string, unknown>
 
-export const cacheKey = ({path, params}) => path + JSON.stringify(params)
+export interface Request extends Record<string, unknown> {
+  io: IO
+  originalPath: string
+  path: string
+  method: string
+  params: Params
+}
 
-export const toRequest = (requestOrPath, methodOrParams, params) => {
+export const isObserveRequest = (request: Request) =>
+  request.method === 'OBSERVE'
+
+export const cacheKey = ({path, params}: Request) =>
+  path + JSON.stringify(params)
+
+export const toRequest = (
+  requestOrPath: Request | string,
+  methodOrParams?: string | Params,
+  params?: Params
+): Request => {
   const request = isString(requestOrPath)
-    ? {
+    ? ({
         path: requestOrPath,
         method: isString(methodOrParams) ? methodOrParams : undefined,
         params: isString(methodOrParams) ? params : methodOrParams,
-      }
+      } as Request)
     : {...requestOrPath}
 
   if (!isString(request.path)) {

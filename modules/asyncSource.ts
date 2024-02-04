@@ -1,7 +1,7 @@
 import {from} from 'rxjs'
 import {switchMap} from 'rxjs/operators'
 import {isFunction} from './util'
-import {markSafeSource, createSafeSource} from './source'
+import {markSafeSource, createSafeSource, Source, SafeSource} from './source'
 import {isObserveRequest} from './request'
 
 // Allow loading source async.
@@ -9,11 +9,13 @@ import {isObserveRequest} from './request'
 // an object with source as the "default" property (ES module).
 // Example assuming source is default export:
 // asyncSource(() => import('lazySource'))
-export const asyncSource = (getSource) => {
+export const asyncSource = (
+  getSource: () => Promise<Source | {default: Source}>
+) => {
   if (!isFunction(getSource)) throw new Error('getSource must be a function')
 
   // Cache to avoid using promises every time.
-  let source = null
+  let source: SafeSource | null = null
 
   return markSafeSource((request) => {
     if (source) return source(request)
@@ -27,7 +29,7 @@ export const asyncSource = (getSource) => {
         )
       })
 
-    const continueRequest = () => source(request)
+    const continueRequest = () => source!(request)
 
     return isObserveRequest(request)
       ? from(sourcePromise).pipe(switchMap(continueRequest))

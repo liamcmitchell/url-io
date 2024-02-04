@@ -7,11 +7,12 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/react-io.mjs",
-      "require": "./dist/react-io.cjs"
+      "import": "./dist/url-io.mjs",
+      "require": "./dist/url-io.cjs"
     }
   },
-  "main": "./dist/react-io.cjs",
+  "main": "./dist/url-io.cjs",
+  "types": "./dist/url-io.d.ts",
   "side-effects": false,
   "scripts": {
     "build": "rimraf dist && rollup -c",
@@ -42,18 +43,20 @@
     "url": "https://github.com/liamcmitchell/url-io/issues"
   },
   "homepage": "https://github.com/liamcmitchell/url-io#readme",
-  "dependencies": {},
   "peerDependencies": {
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.5",
-    "@babel/preset-env": "^7.10.4",
-    "@babel/preset-typescript": "^7.23.2",
+    "@babel/core": "^7.23.6",
+    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-typescript": "^7.23.3",
     "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
     "babel-jest": "^29.7.0",
     "benchmark": "^2.1.4",
-    "eslint": "^8.53.0",
+    "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.6.0",
     "history": "^5.0.0",
@@ -64,8 +67,9 @@
     "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "rollup": "^4.4.1",
+    "rollup-plugin-dts": "^6.1.0",
     "rxjs": "^7.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   },
   "husky": {
     "hooks": {

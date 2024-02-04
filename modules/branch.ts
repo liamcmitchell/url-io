@@ -1,10 +1,14 @@
 import {isFunction} from './util'
-import {markSafeSource, createSafeSource} from './source'
+import {markSafeSource, createSafeSource, Source} from './source'
+import {Request} from './request'
 
-export const branch = (predicate, trueSource) => {
+export const branch = (
+  predicate: (request: Request) => boolean,
+  trueSource: Source
+) => {
   if (!isFunction(predicate)) throw new Error('predicate must be a function')
 
-  return (falseSource) => {
+  return (falseSource: Source) => {
     trueSource = createSafeSource(trueSource)
     falseSource = createSafeSource(falseSource)
 

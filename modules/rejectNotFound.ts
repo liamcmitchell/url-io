@@ -7,6 +7,6 @@ export const rejectNotFound = markSafeSource((request) => {
   const error = new Error(
     `Source could not be found for ${method} ${originalPath}`
   )
-  error.notFound = true
-  return reject(request, error)
+
+  return reject(request, Object.assign(error, {notFound: true}))
 })

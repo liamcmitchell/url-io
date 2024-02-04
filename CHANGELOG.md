@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Support RxJS v8
+- Support RxJS v7
 
 ### Changed
 
 - Made RxJS peer dep
 - Removed Lodash
 - Updated dist output
+- Migrate to TS
 
 ## 5.2.0 - 2020-11-07
 
