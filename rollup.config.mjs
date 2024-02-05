@@ -7,7 +7,7 @@ export default [
     input: './modules/index.ts',
     output: [
       {
-        file: `dist/url-io.mjs`,
+        file: `dist/url-io.js`,
         format: 'es',
       },
       {

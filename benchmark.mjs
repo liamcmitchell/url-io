@@ -2,7 +2,7 @@
 import Benchmark from 'benchmark'
 import {NEVER} from 'rxjs'
 
-import * as urlIO from './dist/url-io.mjs'
+import * as urlIO from './dist/url-io.cjs'
 
 const variants = {
   original: urlIO,

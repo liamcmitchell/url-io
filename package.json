@@ -7,7 +7,7 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/url-io.mjs",
+      "import": "./dist/url-io.js",
       "require": "./dist/url-io.cjs"
     }
   },
